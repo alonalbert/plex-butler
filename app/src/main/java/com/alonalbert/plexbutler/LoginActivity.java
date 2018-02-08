@@ -41,7 +41,7 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 @EActivity(R.layout.activity_login)
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public abstract class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
   /**
    * Id to identity READ_CONTACTS permission request.
@@ -62,15 +62,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
   // UI references.
   @ViewById
-  private AutoCompleteTextView emailEdit;
+  protected AutoCompleteTextView emailEdit;
   @ViewById
-  private EditText passwordEdit;
+  protected EditText passwordEdit;
   @ViewById
-  private View loginProgress;
+  protected View loginProgress;
   @ViewById
-  private View loginForm;
+  protected View loginForm;
   @ViewById
-  private Button signInButton;
+  protected Button signInButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

@@ -18,8 +18,12 @@ android {
     }
 }
 
+def AAVersion = '4.4.0'
+
 dependencies {
-    compile 'org.androidannotations:androidannotations-api:3.3.2'
+    annotationProcessor "org.androidannotations:androidannotations:$AAVersion"
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
@@ -27,8 +31,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
-    compile 'com.google.dagger:dagger:2.0'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.0'
 }
 
