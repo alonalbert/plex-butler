@@ -17,13 +17,13 @@ import org.springframework.util.LinkedMultiValueMap;
 /**
  * Plex API Client
  */
-@Rest(rootUrl =  "https://plex.tv", converters = { GsonHttpMessageConverter.class, FormHttpMessageConverter.class } )
+@Rest(
+  rootUrl =  "https://plex.tv",
+  converters = { GsonHttpMessageConverter.class, FormHttpMessageConverter.class } ,
+  interceptors = {PlexRequestInterceptor.class })
 public interface PlexClient {
   @Post("/users/sign_in.json")
   @Headers({
-    @Header(name = "X-Plex-Product", value = "Plex Butler"),
-    @Header(name = "X-Plex-Version", value = "1.0"),
-    @Header(name = "X-Plex-Client-Identifier", value = "111"),
     @Header(name = HttpHeaders.CONTENT_TYPE, value = MediaType.APPLICATION_FORM_URLENCODED_VALUE),
   })
   ResponseEntity<LoginResponse> login(@Body LinkedMultiValueMap<String, String> data);
