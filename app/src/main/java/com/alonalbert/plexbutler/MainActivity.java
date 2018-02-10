@@ -1,6 +1,7 @@
 package com.alonalbert.plexbutler;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,19 +10,29 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 @SuppressLint("Registered")
 @OptionsMenu(R.menu.main)
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
+
+  private static final int LOGIN_REQUEST_CODE = 0;
+
+  @Pref
+  protected PlexButlerPreferences_ prefs;
 
   @ViewById(R.id.toolbar)
   protected Toolbar toolbar;
@@ -31,6 +42,9 @@ public class MainActivity extends AppCompatActivity
 
   @ViewById(R.id.navigation_view)
   protected NavigationView navigationView;
+
+  @ViewById(R.id.text_view)
+  protected TextView textView;
 
   @AfterViews
   protected void initialize() {
@@ -42,6 +56,19 @@ public class MainActivity extends AppCompatActivity
     toggle.syncState();
 
     navigationView.setNavigationItemSelectedListener(this);
+
+    final String authToken = prefs.plexAuthToken().get();
+    if (!authToken.isEmpty()) {
+      textView.setText(authToken);
+    } else {
+      startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
+    }
+  }
+
+  @OnActivityResult(LOGIN_REQUEST_CODE)
+  void onLoginCompleted(int resultCode, Intent data) {
+    textView.setText(prefs.plexAuthToken().get());
+
   }
 
   @Override
