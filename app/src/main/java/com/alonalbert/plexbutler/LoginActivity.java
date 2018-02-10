@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.alonalbert.plexbutler.plex.PlexClient;
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
-import com.alonalbert.plexbutler.settings.PlexButlerPreferences;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -47,15 +46,15 @@ public class LoginActivity extends AppCompatActivity {
   @RestService
   protected PlexClient plexClient;
 
-  @ViewById
+  @ViewById(R.id.email_edit)
   protected EditText emailEdit;
-  @ViewById
+  @ViewById(R.id.password_edit)
   protected EditText passwordEdit;
-  @ViewById
+  @ViewById(R.id.login_progress)
   protected View loginProgress;
-  @ViewById
+  @ViewById(R.id.login_form)
   protected View loginForm;
-  @ViewById
+  @ViewById(R.id.sign_in_button)
   protected Button signInButton;
 
   @AfterViews
