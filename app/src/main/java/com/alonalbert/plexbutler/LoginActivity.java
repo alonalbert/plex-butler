@@ -7,6 +7,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,12 +15,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.model.LoginResponse;
+import com.alonalbert.plexbutler.settings.PlexButlerPreferences;
+import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.androidannotations.rest.spring.annotations.RestService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * A login screen that offers login via email/password.
@@ -28,15 +41,12 @@ import org.androidannotations.annotations.ViewById;
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends AppCompatActivity {
 
-  /**
-   * A dummy authentication store containing known user names and passwords.
-   * TODO: remove after connecting to a real authentication system.
-   */
-  private static final String[] DUMMY_CREDENTIALS = new String[]{
-      "foo@example.com:hello", "bar@example.com:world"
-  };
+  @Pref
+  PlexButlerPreferences_ prefs;
 
-  // UI references.
+  @RestService
+  protected PlexClient plexClient;
+
   @ViewById
   protected EditText emailEdit;
   @ViewById
@@ -111,31 +121,30 @@ public class LoginActivity extends AppCompatActivity {
   protected void doLogin(String email, String password) {
     // TODO: attempt authentication against a network service.
 
+    final LinkedMultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+    data.set("user[login]", email);
+    data.set("user[password]", password);
     try {
-      // Simulate network access.
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
-      // ignore
+      final ResponseEntity<LoginResponse> response = plexClient.login(data);
+      prefs.edit()
+        .plexAuthToken().put(response.getBody().getUser().getAuthToken())
+        .apply();
+      loginFinished(true, null);
+    } catch (HttpClientErrorException e) {
+      Log.e("PlexButler", "Error", e);
+      final JsonObject json = new JsonParser().parse(e.getResponseBodyAsString()).getAsJsonObject();
+      loginFinished(false, json.get("error").getAsString());
     }
-
-    for (String credential : DUMMY_CREDENTIALS) {
-      String[] pieces = credential.split(":");
-      if (pieces[0].equals(email)) {
-        loginFinished(pieces[1].equals(password));
-        return;
-      }
-    }
-    loginFinished(false);
   }
 
   @UiThread
-  protected void loginFinished(boolean success) {
+  protected void loginFinished(boolean success, String message) {
     showProgress(false);
 
     if (success) {
       finish();
     } else {
-      passwordEdit.setError(getString(R.string.error_incorrect_password));
+      passwordEdit.setError(message);
       passwordEdit.requestFocus();
     }
   }
