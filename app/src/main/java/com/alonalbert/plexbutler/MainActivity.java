@@ -13,15 +13,19 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.model.PlexServer;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.androidannotations.rest.spring.annotations.RestService;
 
 @SuppressLint("Registered")
 @OptionsMenu(R.menu.main)
@@ -33,6 +37,9 @@ public class MainActivity extends AppCompatActivity
 
   @Pref
   protected PlexButlerPreferences_ prefs;
+
+  @RestService
+  protected PlexClient plexClient;
 
   @ViewById(R.id.toolbar)
   protected Toolbar toolbar;
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity
 
     final String authToken = prefs.plexAuthToken().get();
     if (!authToken.isEmpty()) {
-      textView.setText(authToken);
+      loadPlexServers();
     } else {
       startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
     }
@@ -67,8 +74,13 @@ public class MainActivity extends AppCompatActivity
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
   void onLoginCompleted(int resultCode, Intent data) {
-    textView.setText(prefs.plexAuthToken().get());
+    loadPlexServers();
+  }
 
+  @Background
+  protected void loadPlexServers() {
+    final PlexServer[] servers = plexClient.getServers();
+    System.out.println(servers);
   }
 
   @Override
