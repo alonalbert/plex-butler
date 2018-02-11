@@ -1,12 +1,13 @@
-package com.alonalbert.plexbutler;
+package com.alonalbert.plexbutler.recyclerview;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 /**
- * AndroidAnnotations needs this.
+ * AndroidAnnotations needs this to support RecyclerView.
  * https://github.com/androidannotations/androidannotations/wiki/Adapters-and-lists#recyclerview-and-viewholder
  */
-public class ViewWrapper<V extends MainItemView> extends RecyclerView.ViewHolder {
+public class ViewWrapper<V extends View> extends RecyclerView.ViewHolder {
 
   private V view;
 

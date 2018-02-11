@@ -27,6 +27,8 @@ import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.plex.model.Show;
 import com.alonalbert.plexbutler.plex.model.ShowsResponse;
+import com.alonalbert.plexbutler.recyclerview.AbstractRecyclerViewAdapter;
+import com.alonalbert.plexbutler.recyclerview.ViewWrapper;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.collect.ImmutableMap;
 
@@ -260,19 +262,12 @@ public class MainActivity extends AppCompatActivity {
 
 
   @EBean
-  public static class MainAdapter extends RecyclerView.Adapter<ViewWrapper<MainItemView>> {
-
-    private List<MainItem> items = new ArrayList<>();
-
+  public static class MainAdapter extends AbstractRecyclerViewAdapter<MainItem, MainItemView> {
     @RootContext
     Context context;
 
     @Override
-    public ViewWrapper<MainItemView> onCreateViewHolder(ViewGroup parent, int viewType) {
-      return new ViewWrapper<>(onCreateItemView(parent, viewType));
-    }
-
-    private MainItemView onCreateItemView(ViewGroup parent, int viewType) {
+    protected MainItemView onCreateItemView(ViewGroup parent, int viewType) {
       switch (viewType) {
         case MainItem.TYPE_SHOW:
           return ShowItemView_.build(context);
@@ -298,49 +293,5 @@ public class MainActivity extends AppCompatActivity {
     public int getItemViewType(int position) {
       return items.get(position).getType();
     }
-
-    @Override
-    public int getItemCount() {
-      return items.size();
-    }
   }
-
-
-//  @EBean
-//  public static class MainAdapter extends RecyclerView.Adapter<MainViewHolder> {
-//    private static ImmutableMap<MainListItem.Type, Integer> VIEW_TYPES = new ImmutableMap.Builder<MainListItem.Type, Integer>()
-//        .put(MainListItem.Type.SHOW, R.layout.show_list_item)
-//        .build();
-//    private List<MainListItem> items;
-//
-//
-//    @Override
-//    public MainViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//      return ;
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(MainViewHolder holder, int position) {
-//
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//      return items != null ? items.size() : 0;
-//    }
-//
-//    @UiThread
-//    void setItems(List<MainListItem> items) {
-//      this.items = items;
-//      notifyDataSetChanged();
-//    }
-//
-//    static class MainViewHolder extends RecyclerView.ViewHolder {
-//
-//      public MainViewHolder(View itemView) {
-//        super(itemView);
-//      }
-//    }
-//  }
-
 }
