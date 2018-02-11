@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     selectServer();
   }
 
-  @OnActivityResult(LOGIN_REQUEST_CODE)
+  @OnActivityResult(SELECT_SERVER_REQUEST_CODE)
   void onServerSelected(int resultCode, Intent data) {
     server = new Server(
         data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
