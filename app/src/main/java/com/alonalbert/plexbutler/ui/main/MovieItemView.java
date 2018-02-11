@@ -10,17 +10,17 @@ import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
 
 /**
- * A MainItemView for a Shows
+ * A MainItemView for a Movies
  */
-@EViewGroup(R.layout.show_item)
-public class ShowItemView extends MainItemView {
+@EViewGroup(R.layout.movie_item)
+public class MovieItemView extends MainItemView {
   @ViewById(R.id.title)
   protected TextView title;
 
   @ViewById(R.id.image)
   protected ImageView image;
 
-  public ShowItemView(Context context) {
+  public MovieItemView(Context context) {
     super(context);
   }
 
@@ -28,6 +28,6 @@ public class ShowItemView extends MainItemView {
   public void bind(MainItem item) {
     final MediaItem mediaItem = (MediaItem) item;
     title.setText(mediaItem.get().getTitle());
-    image.setImageResource(R.drawable.library_type_show);
+    image.setImageResource(R.drawable.library_type_movie);
   }
 }

@@ -4,8 +4,16 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Show {
+public class Media {
+  public enum Type {
+    @SerializedName("show")
+    SHOW,
+    @SerializedName("movie")
+    MOVIE,
+  }
+
   private String key;
+  private Type type;
   private String title;
   private String summary;
   private String banner;
@@ -19,6 +27,10 @@ public class Show {
 
   public String getKey() {
     return key;
+  }
+
+  public Type getType() {
+    return type;
   }
 
   public String getTitle() {
@@ -59,7 +71,7 @@ public class Show {
 
   @Override
   public String toString() {
-    return "Show: " + title;
+    return "Media: " + title;
   }
 
   private static class Genre {

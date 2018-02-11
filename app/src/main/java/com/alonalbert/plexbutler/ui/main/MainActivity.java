@@ -20,20 +20,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alonalbert.plexbutler.R;
-import com.alonalbert.plexbutler.ui.login.LoginActivity_;
-import com.alonalbert.plexbutler.ui.main.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.model.MediaResponse;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
-import com.alonalbert.plexbutler.plex.model.Show;
-import com.alonalbert.plexbutler.plex.model.ShowsResponse;
+import com.alonalbert.plexbutler.plex.model.Media;
+import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
+import com.alonalbert.plexbutler.ui.login.LoginActivity_;
+import com.alonalbert.plexbutler.ui.main.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
 import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
 import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity;
 import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity_;
-import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.collect.ImmutableMap;
 
 import org.androidannotations.annotations.AfterViews;
@@ -182,14 +182,13 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void loadSection(Section section) {
-    final ShowsResponse response = plexClient.getShowsAll(server.getAddress(), server.getPort(), section.getKey());
+    final MediaResponse response = plexClient.getAllShows(server.getAddress(), server.getPort(), section.getKey());
     Log.e(TAG, "Section " + section.getTitle() + ": " + response);
     final List<MainItem> items = new ArrayList<>();
-    for (Show show : response.getShows()) {
-      items.add(new ShowItem(show));
+    for (Media media : response.getItems()) {
+      items.add(new MediaItem(media));
     }
     mainAdapter.setItems(items);
-
   }
 
   @EBean
@@ -273,6 +272,9 @@ public class MainActivity extends AppCompatActivity {
       switch (viewType) {
         case MainItem.TYPE_SHOW:
           return ShowItemView_.build(context);
+
+        case MainItem.TYPE_MOVIE:
+          return MovieItemView_.build(context);
       }
       throw new UnsupportedOperationException("Unknown type: " + viewType);
     }
