@@ -1,6 +1,7 @@
 package com.alonalbert.plexbutler;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alonalbert.plexbutler.ServerPickerActivity_.PlexServerItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
@@ -27,11 +27,12 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.rest.spring.annotations.RestService;
 
-import static android.widget.Toast.LENGTH_SHORT;
-
 @EActivity(R.layout.activity_server_picker)
 public class ServerPickerActivity extends AppCompatActivity {
 
+  public static final String EXTRA_NAME = "EXTRA_NAME";
+  public static final String EXTRA_ADDRESS = "ADDRESS";
+  public static final String EXTRA_PORT = "PORT";
   @ViewById(R.id.server_list)
   protected ListView serverList;
 
@@ -58,7 +59,12 @@ public class ServerPickerActivity extends AppCompatActivity {
 
   @ItemClick(R.id.server_list)
   void serverListItemClicked(Server server) {
-    Toast.makeText(this, server.getName(), LENGTH_SHORT).show();
+    final Intent data = new Intent()
+        .putExtra(EXTRA_NAME, server.getName())
+        .putExtra(EXTRA_ADDRESS, server.getAddress())
+        .putExtra(EXTRA_PORT, server.getPort());
+    setResult(RESULT_OK, data);
+    finish();
   }
 
   @EBean

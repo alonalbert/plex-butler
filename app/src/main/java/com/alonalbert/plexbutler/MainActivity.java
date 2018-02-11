@@ -19,12 +19,12 @@ import android.widget.Toast;
 
 import com.alonalbert.plexbutler.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.model.PlexResponse;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
@@ -37,6 +37,7 @@ import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.RootContext;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
@@ -92,35 +93,34 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void selectServer() {
-    // First check if we have a server configured yet
-    final String serverAddress = prefs.serverAddress().get();
-    if (serverAddress.isEmpty()) {
-      final Server[] servers = plexClient.getServers();
-      if (servers.length == 1) {
-        final Server server = servers[0];
-        prefs.edit()
-            .serverName().put(server.getName())
-            .serverAddress().put(server.getAddress())
-            .serverPort().put(server.getPort())
-            .apply();
-        loadSections(server);
+    final Server[] servers = plexClient.getServers();
+
+    if (servers.length == 1) {
+      final Server server;
+      server = servers[0];
+      prefs.edit().serverName().put(server.getName()).apply();
+      loadSections(server);
+    } else {
+      final String serverName = prefs.serverName().get();
+      if (!serverName.isEmpty()) {
+        for (Server server : servers) {
+          if (server.getName().equals(serverName)) {
+            loadSections(server);
+            break;
+          }
+        }
       } else {
         startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
       }
-    }  else {
-      loadSections();
     }
-  }
-
-  private void loadSections() {
-    loadSections(new Server(prefs.serverName().get(), prefs.serverAddress().get(), prefs.serverPort().get()));
   }
 
   @Background
   protected void loadSections(Server server) {
-    adapter.setSections(Lists.newArrayList(
-        new Section(Type.MOVIE, "Movies"),
-        new Section(Type.SHOW, "TV Shows")));
+    final PlexResponse response = plexClient.getSections(
+        server.getAddress(),
+        String.valueOf(server.getPort()));
+    adapter.setSections(response.getMediaContainer().getSections());
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -129,8 +129,11 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
-  void onServerSelected(int resultCode) {
-    loadSections();
+  void onServerSelected(int resultCode, Intent data) {
+    loadSections(new Server(
+        data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
+        data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
+        data.getIntExtra(ServerPickerActivity.EXTRA_PORT, 0)));
   }
 
   @Override
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
   @ItemClick(R.id.section_list)
   protected void sectionSelected(Section section) {
-    Toast.makeText(this, "Section selected: " + section.getName(), Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, "Section selected: " + section.getTitle(), Toast.LENGTH_SHORT).show();
     drawerLayout.closeDrawer(GravityCompat.START);
   }
 
@@ -191,8 +194,10 @@ public class MainActivity extends AppCompatActivity {
       return position;
     }
 
+    @UiThread
     void setSections(List<Section> sections) {
       this.sections = sections;
+      notifyDataSetChanged();
     }
   }
 
@@ -207,8 +212,8 @@ public class MainActivity extends AppCompatActivity {
         .put(Type.VIDEO, R.drawable.library_type_video)
         .build();
 
-    @ViewById(R.id.section_name)
-    protected TextView section_name;
+    @ViewById(R.id.section_title)
+    protected TextView section_title;
 
     @ViewById(R.id.section_image)
     protected ImageView section_image;
@@ -218,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void bind(Section section) {
-      section_name.setText(section.getName());
+      section_title.setText(section.getTitle());
       section_image.setImageResource(SECTION_ICONS.get(section.getType()));
     }
   }

@@ -1,38 +1,41 @@
 package com.alonalbert.plexbutler.plex.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
- * A Plex Section
+ * A Library Section
  */
 public class Section {
   public enum Type {
+    @SerializedName("show")
     SHOW,
+    @SerializedName("movie")
     MOVIE,
+    @SerializedName("music")
     MUSIC,
+    @SerializedName("photo")
     PHOTO,
+    @SerializedName("video")
     VIDEO,
   }
 
+  private String title;
   private Type type;
-  private String name;
 
-  public Section(Type type, String name) {
-    this.type = type;
-    this.name = name;
+  public String getTitle() {
+    return title;
   }
 
   public Type getType() {
     return type;
   }
 
-  public String getName() {
-    return name;
-  }
-
   @Override
   public String toString() {
-    return "Section{" +
-        "type=" + type +
-        ", name='" + name + '\'' +
-        '}';
+    final StringBuffer sb = new StringBuffer("sections{");
+    sb.append("title='").append(title).append('\'');
+    sb.append(", type='").append(type).append('\'');
+    sb.append('}');
+    return sb.toString();
   }
 }
