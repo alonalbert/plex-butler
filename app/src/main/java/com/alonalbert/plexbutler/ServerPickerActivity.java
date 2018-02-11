@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.alonalbert.plexbutler.ServerPickerActivity_.PlexServerItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
-import com.alonalbert.plexbutler.plex.model.PlexServer;
+import com.alonalbert.plexbutler.plex.model.Server;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
@@ -36,7 +36,7 @@ public class ServerPickerActivity extends AppCompatActivity {
   protected ListView serverList;
 
   @Bean
-  PlexServerListAdapter adapter;
+  protected PlexServerListAdapter adapter;
 
   @RestService
   protected PlexClient plexClient;
@@ -46,8 +46,8 @@ public class ServerPickerActivity extends AppCompatActivity {
   @AfterInject
   @Background
   void bindAdapter() {
-    final PlexServer[] plexServers = plexClient.getServers();
-    adapter.setPlexServers(plexServers);
+    final Server[] servers = plexClient.getServers();
+    adapter.setServers(servers);
     initializeServerList();
   }
 
@@ -57,14 +57,14 @@ public class ServerPickerActivity extends AppCompatActivity {
   }
 
   @ItemClick(R.id.server_list)
-  void serverListItemClicked(PlexServer plexServer) {
-    Toast.makeText(this, plexServer.getName(), LENGTH_SHORT).show();
+  void serverListItemClicked(Server server) {
+    Toast.makeText(this, server.getName(), LENGTH_SHORT).show();
   }
 
   @EBean
   public static class PlexServerListAdapter extends BaseAdapter {
 
-    private PlexServer[] plexServers;
+    private Server[] servers;
 
     @RootContext
     Context context;
@@ -86,12 +86,12 @@ public class ServerPickerActivity extends AppCompatActivity {
 
     @Override
     public int getCount() {
-      return plexServers.length;
+      return servers.length;
     }
 
     @Override
-    public PlexServer getItem(int position) {
-      return plexServers[position];
+    public Server getItem(int position) {
+      return servers[position];
     }
 
     @Override
@@ -99,11 +99,10 @@ public class ServerPickerActivity extends AppCompatActivity {
       return position;
     }
 
-    void setPlexServers(PlexServer[] plexServers) {
-      this.plexServers = plexServers;
+    void setServers(Server[] servers) {
+      this.servers = servers;
     }
   }
-
 
   @EViewGroup(R.layout.server_item)
   public static class PlexServerItemView extends LinearLayout {
@@ -115,8 +114,8 @@ public class ServerPickerActivity extends AppCompatActivity {
       super(context);
     }
 
-    public void bind(PlexServer plexServer) {
-      name.setText(plexServer.getName());
+    public void bind(Server server) {
+      name.setText(server.getName());
     }
   }
 

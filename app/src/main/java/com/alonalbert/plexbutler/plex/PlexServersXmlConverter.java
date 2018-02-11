@@ -2,7 +2,7 @@ package com.alonalbert.plexbutler.plex;
 
 import android.util.Log;
 
-import com.alonalbert.plexbutler.plex.model.PlexServer;
+import com.alonalbert.plexbutler.plex.model.Server;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.converter.xml.AbstractXmlHttpMessageConverter;
@@ -34,18 +34,18 @@ public class PlexServersXmlConverter extends AbstractXmlHttpMessageConverter {
       final Document document = factory.newDocumentBuilder().parse(streamSource.getInputStream());
       final NodeList serverElements = document.getElementsByTagName("Server");
       final int n = serverElements.getLength();
-      final PlexServer[] plexServers = new PlexServer[n];
+      final Server[] servers = new Server[n];
       for (int i = 0; i < n; i++) {
         final Element serverElement = (Element) serverElements.item(i);
-        plexServers[i] =  new PlexServer(
+        servers[i] =  new Server(
           serverElement.getAttribute("name"),
           serverElement.getAttribute("address"),
           Integer.valueOf(serverElement.getAttribute("port")));
       }
-      return plexServers;
+      return servers;
     } catch (SAXException | ParserConfigurationException e) {
       Log.e(TAG, "Error converting getServers response", e);
-      return new PlexServer[0];
+      return new Server[0];
     }
   }
 
@@ -56,7 +56,7 @@ public class PlexServersXmlConverter extends AbstractXmlHttpMessageConverter {
 
   @Override
   protected boolean supports(Class clazz) {
-    return clazz.equals(PlexServer[].class);
+    return clazz.equals(Server[].class);
   }
 
 }

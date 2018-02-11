@@ -19,5 +19,6 @@
         completions."
     </string>
     <string name="plex_server">Plex Server</string>
-    <string name="name">Name</string>
+    <string name="sample_server_name">Name</string>
+    <string name="sample_section_name">TV Shows</string>
 </resources>

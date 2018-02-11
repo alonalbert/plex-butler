@@ -3,13 +3,13 @@ package com.alonalbert.plexbutler.plex.model;
 /**
  * A Plex Server Pojo
  */
-public class PlexServer {
+public class Server {
 
   private final String name;
   private final String address;
   private final int port;
 
-  public PlexServer(String name, String address, int port) {
+  public Server(String name, String address, int port) {
 
     this.name = name;
     this.address = address;

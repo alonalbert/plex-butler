@@ -1,7 +1,7 @@
 package com.alonalbert.plexbutler.plex;
 
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
-import com.alonalbert.plexbutler.plex.model.PlexServer;
+import com.alonalbert.plexbutler.plex.model.Server;
 
 import org.androidannotations.rest.spring.annotations.Body;
 import org.androidannotations.rest.spring.annotations.Get;
@@ -31,5 +31,5 @@ public interface PlexClient {
   ResponseEntity<LoginResponse> login(@Body LinkedMultiValueMap<String, String> data);
 
   @Get("/pms/servers.xml")
-  PlexServer[] getServers();
+  Server[] getServers();
 }
