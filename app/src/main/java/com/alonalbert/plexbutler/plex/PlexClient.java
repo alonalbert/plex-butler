@@ -1,7 +1,7 @@
 package com.alonalbert.plexbutler.plex;
 
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
-import com.alonalbert.plexbutler.plex.model.PlexResponse;
+import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
 
 import org.androidannotations.rest.spring.annotations.Body;
@@ -36,8 +36,5 @@ public interface PlexClient {
   Server[] getServers();
 
   @Get("http://{address}:{port}/library/sections")
-  @Headers({
-      @Header(name = HttpHeaders.ACCEPT, value = MediaType.APPLICATION_JSON_VALUE),
-  })
-  PlexResponse getSections(@Path String address, @Path String port);
+  SectionsResponse getSections(@Path String address, @Path String port);
 }

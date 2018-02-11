@@ -21,6 +21,7 @@ public class Section {
 
   private String title;
   private Type type;
+  private String key;
 
   public String getTitle() {
     return title;
@@ -32,9 +33,10 @@ public class Section {
 
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("sections{");
+    final StringBuffer sb = new StringBuffer("Section{");
     sb.append("title='").append(title).append('\'');
-    sb.append(", type='").append(type).append('\'');
+    sb.append(", type=").append(type);
+    sb.append(", key='").append(key).append('\'');
     sb.append('}');
     return sb.toString();
   }

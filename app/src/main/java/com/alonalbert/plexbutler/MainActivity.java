@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.alonalbert.plexbutler.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
-import com.alonalbert.plexbutler.plex.model.PlexResponse;
+import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.Server;
@@ -117,10 +117,10 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void loadSections(Server server) {
-    final PlexResponse response = plexClient.getSections(
+    final SectionsResponse response = plexClient.getSections(
         server.getAddress(),
         String.valueOf(server.getPort()));
-    adapter.setSections(response.getMediaContainer().getSections());
+    adapter.setSections(response.getSections());
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)

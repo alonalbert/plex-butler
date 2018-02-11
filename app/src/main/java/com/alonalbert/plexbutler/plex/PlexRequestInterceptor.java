@@ -13,6 +13,7 @@ import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
@@ -38,13 +39,17 @@ public class PlexRequestInterceptor implements ClientHttpRequestInterceptor {
   @Override
   public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
     final HttpHeaders headers = request.getHeaders();
-    if (request.getURI().getPath().equals("/users/sign_in.json")) {
+    final String path = request.getURI().getPath();
+    if (path.equals("/users/sign_in.json")) {
       headers.add("X-Plex-Product", appName);
       headers.add("X-Plex-Version", getVersion());
       // TODO: 2/10/18 Device id
       headers.add("X-Plex-Client-Identifier", "111");
     } else {
       headers.add("X-Plex-Token", prefs.plexAuthToken().get());
+      if (!path.equals("/pms/servers.xml")) {
+        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+      }
     }
     return execution.execute(request, body);
   }
