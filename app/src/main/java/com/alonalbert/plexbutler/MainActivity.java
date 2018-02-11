@@ -7,6 +7,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
+import com.alonalbert.plexbutler.plex.model.Show;
 import com.alonalbert.plexbutler.plex.model.ShowsResponse;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.collect.ImmutableMap;
@@ -45,6 +47,7 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressLint("Registered")
@@ -60,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
   protected PlexButlerPreferences_ prefs;
 
   @Bean
-  protected SectionListAdapter adapter;
+  protected SectionListAdapter sectionAdapter;
+
+  @Bean
+  protected MainAdapter mainAdapter;
 
   @RestService
   protected PlexClient plexClient;
@@ -74,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
   @ViewById(R.id.section_list)
   protected ListView sectionList;
 
-  @ViewById(R.id.text_view)
-  protected TextView textView;
+  @ViewById(R.id.recycler_view)
+  protected RecyclerView recyclerView;
 
   @NonConfigurationInstance
   protected Server server;
@@ -89,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
     drawerLayout.addDrawerListener(toggle);
     toggle.syncState();
 
-    sectionList.setAdapter(adapter);
+    recyclerView.setAdapter(mainAdapter);
+    sectionList.setAdapter(sectionAdapter);
 
     final String authToken = prefs.plexAuthToken().get();
     if (!authToken.isEmpty()) {
@@ -130,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     final SectionsResponse response = plexClient.getSections(
         server.getAddress(),
         server.getPort());
-    adapter.setSections(response.getSections());
+    sectionAdapter.setSections(response.getSections());
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -169,8 +176,14 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void loadSection(Section section) {
-    final ShowsResponse shows = plexClient.getShowsAll(server.getAddress(), server.getPort(), section.getKey());
-    Log.e(TAG, "Section " + section.getTitle() + ": " + shows);
+    final ShowsResponse response = plexClient.getShowsAll(server.getAddress(), server.getPort(), section.getKey());
+    Log.e(TAG, "Section " + section.getTitle() + ": " + response);
+    final List<MainItem> items = new ArrayList<>();
+    for (Show show : response.getShows()) {
+      items.add(new ShowItem(show));
+    }
+    mainAdapter.setItems(items);
+
   }
 
   @EBean
@@ -244,4 +257,90 @@ public class MainActivity extends AppCompatActivity {
       section_image.setImageResource(SECTION_ICONS.get(section.getType()));
     }
   }
+
+
+  @EBean
+  public static class MainAdapter extends RecyclerView.Adapter<ViewWrapper<MainItemView>> {
+
+    private List<MainItem> items = new ArrayList<>();
+
+    @RootContext
+    Context context;
+
+    @Override
+    public ViewWrapper<MainItemView> onCreateViewHolder(ViewGroup parent, int viewType) {
+      return new ViewWrapper<>(onCreateItemView(parent, viewType));
+    }
+
+    private MainItemView onCreateItemView(ViewGroup parent, int viewType) {
+      switch (viewType) {
+        case MainItem.TYPE_SHOW:
+          return ShowItemView_.build(context);
+      }
+      throw new UnsupportedOperationException("Unknown type: " + viewType);
+    }
+
+    @Override
+    public void onBindViewHolder(ViewWrapper<MainItemView> holder, int position) {
+      MainItemView view = holder.getView();
+      final MainItem item = items.get(position);
+
+      view.bind(item);
+    }
+
+    @UiThread
+    protected void setItems(List<MainItem> items) {
+      this.items = items;
+      notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+      return items.get(position).getType();
+    }
+
+    @Override
+    public int getItemCount() {
+      return items.size();
+    }
+  }
+
+
+//  @EBean
+//  public static class MainAdapter extends RecyclerView.Adapter<MainViewHolder> {
+//    private static ImmutableMap<MainListItem.Type, Integer> VIEW_TYPES = new ImmutableMap.Builder<MainListItem.Type, Integer>()
+//        .put(MainListItem.Type.SHOW, R.layout.show_list_item)
+//        .build();
+//    private List<MainListItem> items;
+//
+//
+//    @Override
+//    public MainViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//      return ;
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(MainViewHolder holder, int position) {
+//
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//      return items != null ? items.size() : 0;
+//    }
+//
+//    @UiThread
+//    void setItems(List<MainListItem> items) {
+//      this.items = items;
+//      notifyDataSetChanged();
+//    }
+//
+//    static class MainViewHolder extends RecyclerView.ViewHolder {
+//
+//      public MainViewHolder(View itemView) {
+//        super(itemView);
+//      }
+//    }
+//  }
+
 }
