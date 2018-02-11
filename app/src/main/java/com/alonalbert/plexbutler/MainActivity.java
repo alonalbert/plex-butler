@@ -3,14 +3,11 @@ package com.alonalbert.plexbutler;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -35,6 +32,7 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EViewGroup;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
@@ -48,10 +46,7 @@ import java.util.List;
 @SuppressLint("Registered")
 @OptionsMenu(R.menu.main)
 @EActivity(R.layout.activity_main)
-public class MainActivity extends AppCompatActivity
-    implements NavigationView.OnNavigationItemSelectedListener {
-
-  private static final String TAG = "PlexButler";
+public class MainActivity extends AppCompatActivity {
   private static final int LOGIN_REQUEST_CODE = 0;
   private static final int SELECT_SERVER_REQUEST_CODE = 1;
 
@@ -152,10 +147,10 @@ public class MainActivity extends AppCompatActivity
     Toast.makeText(this, "Settings pressed", Toast.LENGTH_SHORT).show();
   }
 
-  @Override
-  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+  @ItemClick(R.id.section_list)
+  protected void sectionSelected(Section section) {
+    Toast.makeText(this, "Section selected: " + section.getName(), Toast.LENGTH_SHORT).show();
     drawerLayout.closeDrawer(GravityCompat.START);
-    return true;
   }
 
   @EBean
