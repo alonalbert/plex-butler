@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler;
+package com.alonalbert.plexbutler.ui.main;
 
 /**
  * All main screen items implement this

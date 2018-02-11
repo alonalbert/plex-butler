@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler;
+package com.alonalbert.plexbutler.ui.serverpicker;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +10,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.alonalbert.plexbutler.ServerPickerActivity_.PlexServerItemView_;
+import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClient;
 import com.alonalbert.plexbutler.plex.model.Server;
+import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity_.PlexServerItemView_;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;

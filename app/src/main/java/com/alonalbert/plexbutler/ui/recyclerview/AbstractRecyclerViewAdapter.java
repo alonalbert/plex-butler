@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler.recyclerview;
+package com.alonalbert.plexbutler.ui.recyclerview;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

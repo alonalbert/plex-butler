@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity_"
+            android:name=".ui.main.MainActivity_"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -26,10 +26,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginActivity_"
+            android:name=".ui.login.LoginActivity_"
             android:label="@string/title_activity_login"/>
         <activity
-            android:name=".ServerPickerActivity_"
+            android:name=".ui.serverpicker.ServerPickerActivity_"
             android:exported="true"
             />
     </application>

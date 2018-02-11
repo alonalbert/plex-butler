@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler;
+package com.alonalbert.plexbutler.ui.main;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -19,7 +19,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alonalbert.plexbutler.MainActivity_.SectionItemView_;
+import com.alonalbert.plexbutler.R;
+import com.alonalbert.plexbutler.ui.login.LoginActivity_;
+import com.alonalbert.plexbutler.ui.main.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
@@ -27,8 +29,10 @@ import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.plex.model.Show;
 import com.alonalbert.plexbutler.plex.model.ShowsResponse;
-import com.alonalbert.plexbutler.recyclerview.AbstractRecyclerViewAdapter;
-import com.alonalbert.plexbutler.recyclerview.ViewWrapper;
+import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
+import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
+import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity;
+import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity_;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.collect.ImmutableMap;
 
@@ -233,7 +237,6 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-
   @EViewGroup(R.layout.section_item)
   public static class SectionItemView extends LinearLayout {
     static final ImmutableMap<Type, Integer> SECTION_ICONS = new ImmutableMap.Builder<Type, Integer>()
@@ -259,7 +262,6 @@ public class MainActivity extends AppCompatActivity {
       section_image.setImageResource(SECTION_ICONS.get(section.getType()));
     }
   }
-
 
   @EBean
   public static class MainAdapter extends AbstractRecyclerViewAdapter<MainItem, MainItemView> {

@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler;
+package com.alonalbert.plexbutler.ui.login;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClient;
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;

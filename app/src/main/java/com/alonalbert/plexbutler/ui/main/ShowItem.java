@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler;
+package com.alonalbert.plexbutler.ui.main;
 
 import com.alonalbert.plexbutler.plex.model.Show;
 
