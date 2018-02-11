@@ -23,6 +23,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener {
 
   private static final int LOGIN_REQUEST_CODE = 0;
+  private static final int SELECT_SERVER_REQUEST_CODE = 1;
 
   @Pref
   protected PlexButlerPreferences_ prefs;
@@ -66,21 +68,51 @@ public class MainActivity extends AppCompatActivity
 
     final String authToken = prefs.plexAuthToken().get();
     if (!authToken.isEmpty()) {
-      loadPlexServers();
+      selectServer();
     } else {
       startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
     }
   }
 
-  @OnActivityResult(LOGIN_REQUEST_CODE)
-  void onLoginCompleted(int resultCode, Intent data) {
-    loadPlexServers();
+  @Background
+  protected void selectServer() {
+    // First check if we have a server configured yet
+    final String serverAddress = prefs.serverAddress().get();
+    if (serverAddress.isEmpty()) {
+      final PlexServer[] servers = plexClient.getServers();
+      if (servers.length == 1) {
+        final PlexServer server = servers[0];
+        prefs.edit()
+            .serverName().put(server.getName())
+            .serverAddress().put(server.getAddress())
+            .serverPort().put(server.getPort())
+            .apply();
+        loadSections(server);
+      } else {
+        startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
+      }
+    }  else {
+      loadSections();
+    }
   }
 
-  @Background
-  protected void loadPlexServers() {
-    final PlexServer[] servers = plexClient.getServers();
-    System.out.println(servers);
+  private void loadSections() {
+    loadSections(new PlexServer(prefs.serverName().get(), prefs.serverAddress().get(), prefs.serverPort().get()));
+  }
+
+  @UiThread
+  protected void loadSections(PlexServer server) {
+    Toast.makeText(this, "Selected server " + server.getName(), Toast.LENGTH_SHORT).show();
+  }
+
+  @OnActivityResult(LOGIN_REQUEST_CODE)
+  void onLoginCompleted(int resultCode) {
+    selectServer();
+  }
+
+  @OnActivityResult(LOGIN_REQUEST_CODE)
+  void onServerSelected(int resultCode) {
+    loadSections();
   }
 
   @Override

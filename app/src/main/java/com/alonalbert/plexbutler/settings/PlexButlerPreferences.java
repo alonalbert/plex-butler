@@ -13,6 +13,9 @@ public interface PlexButlerPreferences {
   String plexAuthToken();
 
   @DefaultString("")
+  String serverName();
+
+  @DefaultString("")
   String serverAddress();
 
   @DefaultInt(0)
