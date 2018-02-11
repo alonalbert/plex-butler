@@ -1,26 +1,23 @@
 package com.alonalbert.plexbutler.plex.model;
 
 import com.google.gson.annotations.SerializedName;
-
 import java.util.List;
 
-public class SectionsResponse {
+public class ShowsResponse {
   @SerializedName("MediaContainer")
   private MediaContainer mediaContainer;
 
-  public List<Section> getSections() {
-    return mediaContainer.sections;
+  public List<Show> getShows() {
+    return mediaContainer.shows;
   }
 
   @Override
   public String toString() {
-    return "SectionsResponse{" +
-        "sections=" + getSections() +
-        '}';
+    return "Shows=" + getShows();
   }
 
   private class MediaContainer {
-    @SerializedName("Directory")
-    private List<Section> sections;
+    @SerializedName("Metadata")
+    private List<Show> shows;
   }
 }

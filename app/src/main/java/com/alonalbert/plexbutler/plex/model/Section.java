@@ -31,6 +31,11 @@ public class Section {
     return type;
   }
 
+  public String getKey() {
+    return key;
+  }
+
+
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("Section{");

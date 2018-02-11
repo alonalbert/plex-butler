@@ -8,6 +8,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,10 +20,11 @@ import android.widget.Toast;
 
 import com.alonalbert.plexbutler.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.plex.PlexClient;
-import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
+import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
+import com.alonalbert.plexbutler.plex.model.ShowsResponse;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.collect.ImmutableMap;
 
@@ -33,6 +35,7 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ItemClick;
+import org.androidannotations.annotations.NonConfigurationInstance;
 import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
@@ -48,6 +51,8 @@ import java.util.List;
 @OptionsMenu(R.menu.main)
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
+  private static final String TAG = "PlexButler";
+
   private static final int LOGIN_REQUEST_CODE = 0;
   private static final int SELECT_SERVER_REQUEST_CODE = 1;
 
@@ -72,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
   @ViewById(R.id.text_view)
   protected TextView textView;
 
+  @NonConfigurationInstance
+  protected Server server;
+
   @AfterViews
   protected void initialize() {
     setSupportActionBar(toolbar);
@@ -93,33 +101,35 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void selectServer() {
-    final Server[] servers = plexClient.getServers();
+    if (server == null) {
+      final Server[] servers = plexClient.getServers();
 
-    if (servers.length == 1) {
-      final Server server;
-      server = servers[0];
-      prefs.edit().serverName().put(server.getName()).apply();
-      loadSections(server);
-    } else {
-      final String serverName = prefs.serverName().get();
-      if (!serverName.isEmpty()) {
-        for (Server server : servers) {
-          if (server.getName().equals(serverName)) {
-            loadSections(server);
-            break;
-          }
-        }
+      if (servers.length == 1) {
+        server = servers[0];
+        prefs.edit().serverName().put(server.getName()).apply();
       } else {
-        startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
+        final String serverName = prefs.serverName().get();
+        if (!serverName.isEmpty()) {
+          for (Server server : servers) {
+            if (server.getName().equals(serverName)) {
+              this.server = server;
+              break;
+            }
+          }
+        } else {
+          startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
+          return;
+        }
       }
     }
+    loadSections();
   }
 
   @Background
-  protected void loadSections(Server server) {
+  protected void loadSections() {
     final SectionsResponse response = plexClient.getSections(
         server.getAddress(),
-        String.valueOf(server.getPort()));
+        server.getPort());
     adapter.setSections(response.getSections());
   }
 
@@ -130,10 +140,11 @@ public class MainActivity extends AppCompatActivity {
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
   void onServerSelected(int resultCode, Intent data) {
-    loadSections(new Server(
+    server = new Server(
         data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
         data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
-        data.getIntExtra(ServerPickerActivity.EXTRA_PORT, 0)));
+        data.getIntExtra(ServerPickerActivity.EXTRA_PORT, 0));
+    loadSections();
   }
 
   @Override
@@ -152,8 +163,14 @@ public class MainActivity extends AppCompatActivity {
 
   @ItemClick(R.id.section_list)
   protected void sectionSelected(Section section) {
-    Toast.makeText(this, "Section selected: " + section.getTitle(), Toast.LENGTH_SHORT).show();
+    loadSection(section);
     drawerLayout.closeDrawer(GravityCompat.START);
+  }
+
+  @Background
+  protected void loadSection(Section section) {
+    final ShowsResponse shows = plexClient.getShowsAll(server.getAddress(), server.getPort(), section.getKey());
+    Log.e(TAG, "Section " + section.getTitle() + ": " + shows);
   }
 
   @EBean

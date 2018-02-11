@@ -3,6 +3,7 @@ package com.alonalbert.plexbutler.plex;
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
 import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
+import com.alonalbert.plexbutler.plex.model.ShowsResponse;
 
 import org.androidannotations.rest.spring.annotations.Body;
 import org.androidannotations.rest.spring.annotations.Get;
@@ -36,5 +37,11 @@ public interface PlexClient {
   Server[] getServers();
 
   @Get("http://{address}:{port}/library/sections")
-  SectionsResponse getSections(@Path String address, @Path String port);
+  SectionsResponse getSections(@Path String address, @Path int port);
+
+  @Get("http://{address}:{port}/library/sections/{key}/all")
+  ShowsResponse getShowsAll(@Path String address, @Path int port, @Path String key);
+
+  @Get("http://{address}:{port}/library/sections/{key}/unwatched")
+  ShowsResponse getShowsUnwatched(@Path String address, @Path int port, @Path String key);
 }
