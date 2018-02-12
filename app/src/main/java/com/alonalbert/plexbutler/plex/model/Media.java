@@ -69,12 +69,20 @@ public class Media extends PlexObject {
     return viewCount;
   }
 
+  public void setViewCount(int viewCount) {
+    this.viewCount = viewCount;
+  }
+
   public int getLeafCount() {
     return leafCount;
   }
 
   public int getViewedLeafCount() {
     return viewedLeafCount;
+  }
+
+  public void setViewedLeafCount(int viewedLeafCount) {
+    this.viewedLeafCount = viewedLeafCount;
   }
 
   public int getYear() {

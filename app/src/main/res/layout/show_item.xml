@@ -2,8 +2,8 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_item_height"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingStart="@dimen/list_item_padding"
+    android:paddingEnd="@dimen/list_item_padding"
     >
 
     <ImageView
@@ -22,8 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginStart="@dimen/list_item_text_margin"
+        android:layout_marginTop="@dimen/list_item_text_margin"
         android:layout_toEndOf="@id/image"
         android:layout_toStartOf="@id/unwatched_count"
         android:ellipsize="end"
@@ -37,8 +37,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginBottom="@dimen/list_item_text_margin"
+        android:layout_marginStart="@dimen/list_item_text_margin"
         android:layout_toEndOf="@id/image"
         android:text="@string/year_example"
         />
@@ -48,8 +48,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginBottom="@dimen/list_item_text_margin"
+        android:layout_marginStart="@dimen/list_item_text_margin"
         android:layout_toEndOf="@id/year"
         android:layout_toStartOf="@id/unwatched_count"
         android:ellipsize="end"
@@ -64,7 +64,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/toggle_watched_state"
-        android:padding="10dp"
+        android:padding="@dimen/toggle_watched_padding"
         android:src="@drawable/ic_action_watched"
         />
 
@@ -74,7 +74,6 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/toggle_watched"
-        android:textColor="@color/unwatched"
         android:text="@string/sample_unwatched_count"
         />
 

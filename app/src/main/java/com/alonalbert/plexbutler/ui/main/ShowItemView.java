@@ -11,6 +11,7 @@ import com.alonalbert.plexbutler.plex.model.Media;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.ColorRes;
 
 import static com.alonalbert.plexbutler.plex.model.Media.Type.SHOW;
 
@@ -37,8 +38,13 @@ public class ShowItemView extends MainItemView {
   @ViewById(R.id.unwatched_count)
   protected TextView unwatchedCount;
 
+  @ColorRes(R.color.unwatched)
+  protected int unwatchedColor;
+
+  @ColorRes(R.color.watched)
+  protected int watchedColor;
+
   private Media media;
-  private int numUnwatched;
 
   public ShowItemView(Context context) {
     super(context);
@@ -56,18 +62,20 @@ public class ShowItemView extends MainItemView {
     }
     genres.setText(TextUtils.join(", ", mediaItem.get().getGenres()));
 
-    if (media.getType() == SHOW) {
-      numUnwatched = media.getLeafCount() - media.getViewedLeafCount();
-    } else {
-      numUnwatched = 1 - media.getViewCount();
-    }
     updatedWatchedToggle();
   }
 
   private void updatedWatchedToggle() {
-    toggleWatched.setColorFilter(numUnwatched > 0 ? getResources().getColor(R.color.unwatched) : 0xffffffff);
-    unwatchedCount.setText(getResources().getString(R.string.unwatched_count, numUnwatched));
-    unwatchedCount.setVisibility(numUnwatched > 0 && media.getType() == SHOW ? VISIBLE : INVISIBLE);
+    final int leafCount = media.getLeafCount();
+    final int numUnwatched = leafCount - media.getViewedLeafCount();
+    final int color = numUnwatched > 0 ? unwatchedColor : watchedColor;
+    toggleWatched.setColorFilter(color);
+    unwatchedCount.setTextColor(color);
+    if (numUnwatched != 0) {
+      unwatchedCount.setText(getResources().getString(R.string.unwatched_count, numUnwatched, leafCount));
+    } else {
+      unwatchedCount.setText(String.valueOf(leafCount));
+    }
   }
   @Click(R.id.layout)
   protected void onItemClick() {
@@ -78,14 +86,12 @@ public class ShowItemView extends MainItemView {
 
   @Click(R.id.toggle_watched)
   protected void onImageClick() {
+    final int leafCount = media.getLeafCount();
+    final int numUnwatched = leafCount - media.getViewedLeafCount();
     if (numUnwatched == 0) {
-      if (media.getType() == SHOW) {
-        numUnwatched = media.getLeafCount();
-      } else {
-        numUnwatched = 1;
-      }
+      media.setViewedLeafCount(0);
     } else {
-      numUnwatched = 0;
+      media.setViewedLeafCount(leafCount);
     }
     updatedWatchedToggle();
   }
