@@ -24,4 +24,6 @@
     <string name="header_icon">Header icon</string>
     <string name="title">Title</string>
     <string name="tv_show">TV Show</string>
+    <string name="genre_example">Drama, Crime</string>
+    <string name="year_example">2018</string>
 </resources>

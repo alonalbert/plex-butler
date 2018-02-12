@@ -302,16 +302,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected MainItemView onCreateItemView(ViewGroup parent, int viewType) {
+      // TODO: 2/12/18 Maybe all media items can use the same view?
       switch (viewType) {
         case MainItem.TYPE_SHOW:
           return ShowItemView_.build(context);
 
         case MainItem.TYPE_EPISODE:
-          // TODO: 2/12/18 make episode view?
           return ShowItemView_.build(context);
 
         case MainItem.TYPE_MOVIE:
-          return MovieItemView_.build(context);
+          return ShowItemView_.build(context);
       }
       throw new UnsupportedOperationException("Unknown type: " + viewType);
     }

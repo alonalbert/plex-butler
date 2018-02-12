@@ -61,9 +61,11 @@ public class Media extends PlexObject {
   }
 
   public List<String> getGenres() {
-    final ArrayList<String> values = new ArrayList<>(genres.size());
-    for (Genre genre : genres) {
-      values.add(genre.tag);
+    final ArrayList<String> values = new ArrayList<>();
+    if (genres != null) {
+      for (Genre genre : genres) {
+        values.add(genre.tag);
+      }
     }
     return values;
   }
