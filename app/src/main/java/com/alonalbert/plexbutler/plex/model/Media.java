@@ -9,12 +9,20 @@ public class Media extends PlexObject {
   public enum Type {
     @SerializedName("show")
     SHOW,
+    @SerializedName("season")
+    SEASON,
+    @SerializedName("episode")
+    EPISODE,
     @SerializedName("movie")
     MOVIE,
   }
 
   private Type type;
+  private String parentTitle;
+  private String grandparentTitle;
   private String summary;
+  private int index;
+  private int parentIndex;
   private String banner;
   private String thumb;
   private int leafCount;

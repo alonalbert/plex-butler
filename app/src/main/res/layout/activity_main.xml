@@ -19,13 +19,13 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
+        android:background="@android:color/black"
         >
         <include layout="@layout/nav_header_main"/>
         <ListView
             android:id="@+id/section_list"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:background="@android:color/black"
             tools:listitem="@layout/section_item"
             />
 

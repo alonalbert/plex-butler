@@ -22,6 +22,8 @@ public class MediaItem implements MainItem<Media> {
     switch (media.getType()) {
       case SHOW:
         return MainItem.TYPE_SHOW;
+      case EPISODE:
+        return MainItem.TYPE_EPISODE;
       case MOVIE:
         return TYPE_MOVIE;
 

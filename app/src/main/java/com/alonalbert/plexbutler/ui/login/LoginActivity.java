@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClientImpl;
-import com.alonalbert.plexbutler.plex.model.LoginResponse;
+import com.alonalbert.plexbutler.plex.model.LoginResponse.User;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -124,9 +124,9 @@ public class LoginActivity extends AppCompatActivity {
     data.set("user[login]", email);
     data.set("user[password]", password);
     try {
-      final LoginResponse response = plexClient.login(data);
+      final User user = plexClient.login(data);
       prefs.edit()
-        .plexAuthToken().put(response.getUser().getAuthToken())
+        .plexAuthToken().put(user.getAuthToken())
         .apply();
       loginFinished(true, null);
     } catch (HttpClientErrorException e) {

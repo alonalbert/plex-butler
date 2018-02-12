@@ -1,5 +1,6 @@
 package com.alonalbert.plexbutler.ui.serverpicker;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -26,8 +27,8 @@ import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.rest.spring.annotations.RestService;
 
+@SuppressLint("Registered")
 @EActivity(R.layout.activity_server_picker)
 public class ServerPickerActivity extends AppCompatActivity {
 

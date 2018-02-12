@@ -3,13 +3,13 @@ package com.alonalbert.plexbutler.ui.main;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
   @ViewById(R.id.toolbar)
   protected Toolbar toolbar;
 
+  @ViewById(R.id.serverName)
+  protected TextView serverName;
+
   @ViewById(R.id.drawer_layout)
   protected DrawerLayout drawerLayout;
 
@@ -131,17 +134,21 @@ public class MainActivity extends AppCompatActivity {
       }
     }
     if (server != null) {
+      setServerName(server.getName());
       loadSections();
     } else {
       startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
     }
   }
 
+  @UiThread
+  protected void setServerName(String name) {
+    serverName.setText(name);
+  }
+
   @Background
   protected void loadSections() {
-    final List<Section> sections = plexClient.getSections(
-        server.getAddress(),
-        server.getPort());
+    final List<Section> sections = plexClient.getSections(server);
     final Section section = sections.get(0);
     displayStack.push(section);
     loadSection(section);
@@ -194,17 +201,27 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void loadSection(Section section) {
-    final List<Media> mediaList = plexClient.getMedia(
-        server.getAddress(),
-        server.getPort(),
+    final List<Media> mediaList = plexClient.getSection(
+        server,
         section.getKey(),
         prefs.filterUnwatched().get());
-    Log.e(TAG, "Section " + section.getTitle() + ": " + mediaList);
+    mainAdapter.setItems(getMainItems(mediaList));
+  }
+
+  @Background
+  public void loadShow(Media media) {
+    displayStack.push(media);
+    final List<Media> seasons = plexClient.getShow(server, media.getKey());
+    mainAdapter.setItems(getMainItems(seasons));
+  }
+
+  @NonNull
+  private static List<MainItem> getMainItems(List<Media> mediaList) {
     final List<MainItem> items = new ArrayList<>();
     for (Media media : mediaList) {
       items.add(new MediaItem(media));
     }
-    mainAdapter.setItems(items);
+    return items;
   }
 
   @EBean
@@ -287,6 +304,10 @@ public class MainActivity extends AppCompatActivity {
     protected MainItemView onCreateItemView(ViewGroup parent, int viewType) {
       switch (viewType) {
         case MainItem.TYPE_SHOW:
+          return ShowItemView_.build(context);
+
+        case MainItem.TYPE_EPISODE:
+          // TODO: 2/12/18 make episode view?
           return ShowItemView_.build(context);
 
         case MainItem.TYPE_MOVIE:

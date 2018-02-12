@@ -21,4 +21,7 @@
     <string name="plex_server">Plex Server</string>
     <string name="sample_server_name">Name</string>
     <string name="sample_section_name">TV Shows</string>
+    <string name="header_icon">Header icon</string>
+    <string name="title">Title</string>
+    <string name="tv_show">TV Show</string>
 </resources>
