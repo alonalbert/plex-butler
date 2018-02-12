@@ -25,6 +25,7 @@ public class Media extends PlexObject {
   private int parentIndex;
   private String banner;
   private String thumb;
+  private int viewCount;
   private int leafCount;
   private int viewedLeafCount;
   private int year;
@@ -36,8 +37,24 @@ public class Media extends PlexObject {
     return type;
   }
 
+  public String getParentTitle() {
+    return parentTitle;
+  }
+
+  public String getGrandparentTitle() {
+    return grandparentTitle;
+  }
+
   public String getSummary() {
     return summary;
+  }
+
+  public int getIndex() {
+    return index;
+  }
+
+  public int getParentIndex() {
+    return parentIndex;
   }
 
   public String getBanner() {
@@ -46,6 +63,10 @@ public class Media extends PlexObject {
 
   public String getThumb() {
     return thumb;
+  }
+
+  public int getViewCount() {
+    return viewCount;
   }
 
   public int getLeafCount() {

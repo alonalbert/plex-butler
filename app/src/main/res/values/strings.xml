@@ -26,4 +26,7 @@
     <string name="tv_show">TV Show</string>
     <string name="genre_example">Drama, Crime</string>
     <string name="year_example">2018</string>
+    <string name="toggle_watched_state">Toggle watched state</string>
+    <string name="sample_unwatched_count">3x</string>
+    <string name="unwatched_count">%1$dx</string>
 </resources>

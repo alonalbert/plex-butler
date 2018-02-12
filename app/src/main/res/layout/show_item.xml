@@ -1,9 +1,7 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="@dimen/list_item_height"
+    android:layout_height="@dimen/list_item_height"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     >
@@ -12,60 +10,72 @@
         android:id="@+id/image"
         android:layout_width="@dimen/list_item_image_size"
         android:layout_height="@dimen/list_item_image_size"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="12dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:contentDescription="@string/plex_server"
         android:src="@drawable/library_type_show"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="16dp"
         android:layout_marginTop="12dp"
+        android:layout_toEndOf="@id/image"
+        android:layout_toStartOf="@id/unwatched_count"
         android:ellipsize="end"
         android:singleLine="true"
         android:text="@string/title"
         android:textSize="@dimen/list_item_main_text_size"
-        app:layout_constraintStart_toEndOf="@+id/image"
-        app:layout_constraintTop_toTopOf="parent" />
+        />
 
     <TextView
         android:id="@+id/year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/image"
         android:text="@string/year_example"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/image" />
+        />
 
     <TextView
         android:id="@+id/genres"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/year"
+        android:layout_toStartOf="@id/unwatched_count"
+        android:ellipsize="end"
+        android:singleLine="true"
         android:text="@string/genre_example"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/year" />
+        />
 
     <ImageView
-        android:id="@+id/watched"
+        android:id="@+id/toggle_watched"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:layout_marginTop="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/toggle_watched_state"
         android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_action_watched" />
+        android:src="@drawable/ic_action_watched"
+        />
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/unwatched_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/toggle_watched"
+        android:textColor="@color/unwatched"
+        android:text="@string/sample_unwatched_count"
+        />
+
+</RelativeLayout>
