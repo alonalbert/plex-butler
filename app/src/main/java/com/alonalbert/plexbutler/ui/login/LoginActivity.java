@@ -16,7 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.alonalbert.plexbutler.R;
-import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.gson.JsonObject;
@@ -24,13 +24,12 @@ import com.google.gson.JsonParser;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.androidannotations.rest.spring.annotations.RestService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -44,8 +43,8 @@ public class LoginActivity extends AppCompatActivity {
   @Pref
   PlexButlerPreferences_ prefs;
 
-  @RestService
-  protected PlexClient plexClient;
+  @Bean
+  protected PlexClientImpl plexClient;
 
   @ViewById(R.id.email_edit)
   protected EditText emailEdit;
@@ -125,9 +124,9 @@ public class LoginActivity extends AppCompatActivity {
     data.set("user[login]", email);
     data.set("user[password]", password);
     try {
-      final ResponseEntity<LoginResponse> response = plexClient.login(data);
+      final LoginResponse response = plexClient.login(data);
       prefs.edit()
-        .plexAuthToken().put(response.getBody().getUser().getAuthToken())
+        .plexAuthToken().put(response.getUser().getAuthToken())
         .apply();
       loginFinished(true, null);
     } catch (HttpClientErrorException e) {

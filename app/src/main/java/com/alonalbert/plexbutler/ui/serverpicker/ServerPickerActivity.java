@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alonalbert.plexbutler.R;
-import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity_.PlexServerItemView_;
 
@@ -40,8 +40,8 @@ public class ServerPickerActivity extends AppCompatActivity {
   @Bean
   protected PlexServerListAdapter adapter;
 
-  @RestService
-  protected PlexClient plexClient;
+  @Bean
+  protected PlexClientImpl plexClient;
 
 
   @AfterViews

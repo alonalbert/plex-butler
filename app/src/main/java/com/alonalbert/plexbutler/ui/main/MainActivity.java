@@ -20,13 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alonalbert.plexbutler.R;
-import com.alonalbert.plexbutler.plex.PlexClient;
+import com.alonalbert.plexbutler.plex.PlexClientImpl;
+import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.MediaResponse;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
-import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.alonalbert.plexbutler.ui.login.LoginActivity_;
 import com.alonalbert.plexbutler.ui.main.MainActivity_.SectionItemView_;
@@ -51,10 +51,10 @@ import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.androidannotations.rest.spring.annotations.RestService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @SuppressLint("Registered")
 @OptionsMenu(R.menu.main)
@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
   @Bean
   protected MainAdapter mainAdapter;
 
-  @RestService
-  protected PlexClient plexClient;
+  @Bean
+  protected PlexClientImpl plexClient;
 
   @ViewById(R.id.toolbar)
   protected Toolbar toolbar;
@@ -115,27 +115,23 @@ public class MainActivity extends AppCompatActivity {
   @Background
   protected void selectServer() {
     if (server == null) {
-      final Server[] servers = plexClient.getServers();
+      final Map<String, Server> servers = plexClient.getServersAsMap();
 
-      if (servers.length == 1) {
-        server = servers[0];
+      if (servers.size() == 1) {
+        server = servers.values().iterator().next();
         prefs.edit().serverName().put(server.getName()).apply();
       } else {
         final String serverName = prefs.serverName().get();
         if (!serverName.isEmpty()) {
-          for (Server server : servers) {
-            if (server.getName().equals(serverName)) {
-              this.server = server;
-              break;
-            }
-          }
-        } else {
-          startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
-          return;
+          server = servers.get(serverName);
         }
       }
     }
-    loadSections();
+    if (server != null) {
+      loadSections();
+    } else {
+      startActivityForResult(new Intent(this, ServerPickerActivity_.class), SELECT_SERVER_REQUEST_CODE);
+    }
   }
 
   @Background
