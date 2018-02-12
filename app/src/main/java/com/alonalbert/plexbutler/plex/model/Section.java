@@ -5,7 +5,8 @@ import com.google.gson.annotations.SerializedName;
 /**
  * A Library Section
  */
-public class Section {
+@SuppressWarnings("unused")
+public class Section extends PlexObject {
   public enum Type {
     @SerializedName("show")
     SHOW,
@@ -19,30 +20,14 @@ public class Section {
     VIDEO,
   }
 
-  private String title;
   private Type type;
-  private String key;
-
-  public String getTitle() {
-    return title;
-  }
 
   public Type getType() {
     return type;
   }
 
-  public String getKey() {
-    return key;
-  }
-
-
   @Override
   public String toString() {
-    final StringBuffer sb = new StringBuffer("Section{");
-    sb.append("title='").append(title).append('\'');
-    sb.append(", type=").append(type);
-    sb.append(", key='").append(key).append('\'');
-    sb.append('}');
-    return sb.toString();
+    return "Section: " + getTitle();
   }
 }

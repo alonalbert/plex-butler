@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Media {
+@SuppressWarnings({"unused", "MismatchedQueryAndUpdateOfCollection"})
+public class Media extends PlexObject {
   public enum Type {
     @SerializedName("show")
     SHOW,
@@ -12,9 +13,7 @@ public class Media {
     MOVIE,
   }
 
-  private String key;
   private Type type;
-  private String title;
   private String summary;
   private String banner;
   private String thumb;
@@ -25,16 +24,8 @@ public class Media {
   @SerializedName("Genre")
   private List<Genre> genres;
 
-  public String getKey() {
-    return key;
-  }
-
   public Type getType() {
     return type;
-  }
-
-  public String getTitle() {
-    return title;
   }
 
   public String getSummary() {
@@ -71,7 +62,7 @@ public class Media {
 
   @Override
   public String toString() {
-    return "Media: " + title;
+    return "Media: " + getTitle();
   }
 
   private static class Genre {

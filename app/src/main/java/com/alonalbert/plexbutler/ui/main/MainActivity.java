@@ -22,10 +22,9 @@ import android.widget.Toast;
 import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Media;
-import com.alonalbert.plexbutler.plex.model.MediaResponse;
+import com.alonalbert.plexbutler.plex.model.PlexObject;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
-import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.alonalbert.plexbutler.ui.login.LoginActivity_;
@@ -55,6 +54,7 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 @SuppressLint("Registered")
 @OptionsMenu(R.menu.main)
@@ -92,12 +92,15 @@ public class MainActivity extends AppCompatActivity {
   @NonConfigurationInstance
   protected Server server;
 
+  @NonConfigurationInstance
+  protected Stack<PlexObject> displayStack = new Stack<>();
+
   @AfterViews
   protected void initialize() {
     setSupportActionBar(toolbar);
 
     final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-      this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     drawerLayout.addDrawerListener(toggle);
     toggle.syncState();
 
@@ -136,10 +139,13 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void loadSections() {
-    final SectionsResponse response = plexClient.getSections(
+    final List<Section> sections = plexClient.getSections(
         server.getAddress(),
         server.getPort());
-    sectionAdapter.setSections(response.getSections());
+    final Section section = sections.get(0);
+    displayStack.push(section);
+    loadSection(section);
+    sectionAdapter.setSections(sections);
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -161,7 +167,15 @@ public class MainActivity extends AppCompatActivity {
     if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
       drawerLayout.closeDrawer(GravityCompat.START);
     } else {
-      super.onBackPressed();
+      displayStack.pop();
+      if (displayStack.empty()) {
+        super.onBackPressed();
+      } else {
+        final PlexObject plexObject = displayStack.peek();
+        if (plexObject instanceof Section) {
+          loadSection((Section) plexObject);
+        }
+      }
     }
   }
 
@@ -172,16 +186,22 @@ public class MainActivity extends AppCompatActivity {
 
   @ItemClick(R.id.section_list)
   protected void sectionSelected(Section section) {
+    displayStack.clear();
+    displayStack.push(section);
     loadSection(section);
     drawerLayout.closeDrawer(GravityCompat.START);
   }
 
   @Background
   protected void loadSection(Section section) {
-    final MediaResponse response = plexClient.getAllShows(server.getAddress(), server.getPort(), section.getKey());
-    Log.e(TAG, "Section " + section.getTitle() + ": " + response);
+    final List<Media> mediaList = plexClient.getMedia(
+        server.getAddress(),
+        server.getPort(),
+        section.getKey(),
+        prefs.filterUnwatched().get());
+    Log.e(TAG, "Section " + section.getTitle() + ": " + mediaList);
     final List<MainItem> items = new ArrayList<>();
-    for (Media media : response.getItems()) {
+    for (Media media : mediaList) {
       items.add(new MediaItem(media));
     }
     mainAdapter.setItems(items);

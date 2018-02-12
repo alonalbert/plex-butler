@@ -2,7 +2,7 @@ package com.alonalbert.plexbutler;
 
 import android.app.Application;
 
-import com.alonalbert.plexbutler.settings.LoggingExceptionHandler;
+import com.alonalbert.plexbutler.plex.LoggingExceptionHandler;
 
 /**
  * Application class

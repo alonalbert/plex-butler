@@ -1,8 +1,8 @@
 package com.alonalbert.plexbutler.plex;
 
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
-import com.alonalbert.plexbutler.plex.model.MediaResponse;
-import com.alonalbert.plexbutler.plex.model.SectionsResponse;
+import com.alonalbert.plexbutler.plex.model.Media;
+import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Server;
 
 import org.androidannotations.annotations.EBean;
@@ -10,6 +10,7 @@ import org.androidannotations.rest.spring.annotations.RestService;
 import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +18,11 @@ import java.util.Map;
  */
 @EBean
 public class PlexClientImpl {
+    private static final String FILTER_UNWATCHED = "unwatched";
+    private static final String FILTER_ALL = "all";
+
     @RestService
-    protected PlexClient plexClient;
+    PlexClient plexClient;
 
     public LoginResponse login(LinkedMultiValueMap<String, String> data) {
         return plexClient.login(data);
@@ -37,15 +41,11 @@ public class PlexClientImpl {
         return map;
     }
 
-    public SectionsResponse getSections(String address, int port) {
-        return plexClient.getSections(address, port);
+    public List<Section> getSections(String address, int port) {
+        return plexClient.getSections(address, port).getSections();
     }
 
-    public MediaResponse getAllShows(String address, int port, String key) {
-        return plexClient.getAllShows(address, port, key);
-    }
-
-    public MediaResponse getShowsUnwatched(String address, int port, String key) {
-        return plexClient.getShowsUnwatched(address, port, key);
+    public List<Media> getMedia(String address, int port, String key, boolean unwatched) {
+        return plexClient.getMedia(address, port, key, unwatched ? FILTER_UNWATCHED : FILTER_ALL).getItems();
     }
 }

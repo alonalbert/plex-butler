@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler.settings;
+package com.alonalbert.plexbutler.plex;
 
 import android.util.Log;
 

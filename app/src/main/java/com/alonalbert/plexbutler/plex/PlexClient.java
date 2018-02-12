@@ -38,9 +38,6 @@ interface PlexClient {
   @Get("http://{address}:{port}/library/sections")
   SectionsResponse getSections(@Path String address, @Path int port);
 
-  @Get("http://{address}:{port}/library/sections/{key}/all")
-  MediaResponse getAllShows(@Path String address, @Path int port, @Path String key);
-
-  @Get("http://{address}:{port}/library/sections/{key}/unwatched")
-  MediaResponse getShowsUnwatched(@Path String address, @Path int port, @Path String key);
+  @Get("http://{address}:{port}/library/sections/{key}/{filter}")
+  MediaResponse getMedia(@Path String address, @Path int port, @Path String key, @Path String filter);
 }
