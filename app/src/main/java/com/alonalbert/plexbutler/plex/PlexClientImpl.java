@@ -68,18 +68,20 @@ public class PlexClientImpl {
   public List<Media> getShow(Server server, String key, boolean unwatched) {
     final String address = server.getAddress();
     final int port = server.getPort();
-    final List<Media> seasons = plexClient.getMedia(address, port, key).getItems();
     final ArrayList<Media> episodes = new ArrayList<>();
-    for (Media season : seasons) {
-      final List<Media> items = plexClient.getMedia(address, port, season.getKey()).getItems();
-      if (unwatched) {
-        for (Media item : items) {
-          if (item.getViewCount() == 0) {
-            episodes.add(item);
+    final List<Media> seasons = plexClient.getMedia(address, port, key).getItems();
+    if (seasons != null) {
+      for (Media season : seasons) {
+        final List<Media> items = plexClient.getMedia(address, port, season.getKey()).getItems();
+        if (unwatched) {
+          for (Media item : items) {
+            if (item.getViewCount() == 0) {
+              episodes.add(item);
+            }
           }
+        } else {
+          episodes.addAll(items);
         }
-      } else {
-        episodes.addAll(items);
       }
     }
     return episodes;
