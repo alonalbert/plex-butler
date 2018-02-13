@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   protected void loadSection(Section section) {
+    setTitle(section);
     final List<Media> mediaList = plexClient.getSection(
         server,
         section.getKey(),
@@ -210,9 +211,15 @@ public class MainActivity extends AppCompatActivity {
 
   @Background
   public void loadShow(Media media) {
+    setTitle(media);
     displayStack.push(media);
     final List<Media> seasons = plexClient.getShow(server, media.getKey());
     mainAdapter.setItems(getMainItems(seasons));
+  }
+
+  @UiThread
+  public void setTitle(PlexObject plexObject) {
+    super.setTitle(plexObject.getTitle());
   }
 
   @NonNull
