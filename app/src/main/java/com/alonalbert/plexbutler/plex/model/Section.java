@@ -1,6 +1,9 @@
 package com.alonalbert.plexbutler.plex.model;
 
+import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 /**
  * A Library Section
@@ -19,11 +22,15 @@ public class Section extends PlexObject {
     @SerializedName("video")
     VIDEO,
   }
-
   private Type type;
 
   public Type getType() {
     return type;
+  }
+
+  @Override
+  public List<Media> load(PlexClientImpl plexClient, Server server, boolean unwatched) {
+    return plexClient.getSection(server, getKey(), unwatched);
   }
 
   @Override

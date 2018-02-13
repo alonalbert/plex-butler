@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="watched">#AAAAAA</color>
     <color name="unwatched">#D1801C</color>
+    <color name="itemBackground">#CCCCCC</color>
 </resources>

@@ -136,7 +136,7 @@ public class MediaItemView extends MainItemView {
   @Click(R.id.layout)
   protected void onItemClick() {
     if (media.getType() == SHOW) {
-      ((MainActivity) getContext()).loadShow(media);
+      ((MainActivity) getContext()).loadPlexObject(media);
     }
   }
 

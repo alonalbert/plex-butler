@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -77,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
   @Bean
   protected PlexClientImpl plexClient;
 
+  @ViewById(R.id.swipe_refresh)
+  protected SwipeRefreshLayout swipeRefresh;
+
   @ViewById(R.id.toolbar)
   protected Toolbar toolbar;
 
@@ -107,6 +112,13 @@ public class MainActivity extends AppCompatActivity {
     drawerLayout.addDrawerListener(toggle);
     toggle.syncState();
 
+    swipeRefresh.setOnRefreshListener(new OnRefreshListener() {
+      @Override
+      public void onRefresh() {
+        loadItems();
+      }
+    });
+
     recyclerView.setAdapter(mainAdapter);
     sectionList.setAdapter(sectionAdapter);
 
@@ -116,6 +128,26 @@ public class MainActivity extends AppCompatActivity {
     } else {
       startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
     }
+  }
+
+
+  @Background
+  @OptionsItem(R.id.menu_refresh)
+  protected void loadItems() {
+    final PlexObject plexObject = displayStack.peek();
+    setTitle(plexObject);
+    setRefreshing(true);
+    final List<Media> mediaList = plexObject.load(
+        plexClient,
+        server,
+        prefs.filterUnwatched().get());
+    mainAdapter.setItems(getMainItems(mediaList));
+    setRefreshing(false);
+  }
+
+  @UiThread
+  protected void setRefreshing(boolean refreshing) {
+    swipeRefresh.setRefreshing(refreshing);
   }
 
   @Background
@@ -149,10 +181,10 @@ public class MainActivity extends AppCompatActivity {
   @Background
   protected void loadSections() {
     final List<Section> sections = plexClient.getSections(server);
+    sectionAdapter.setSections(sections);
     final Section section = sections.get(0);
     displayStack.push(section);
-    loadSection(section);
-    sectionAdapter.setSections(sections);
+    loadItems();
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -178,10 +210,7 @@ public class MainActivity extends AppCompatActivity {
       if (displayStack.empty()) {
         super.onBackPressed();
       } else {
-        final PlexObject plexObject = displayStack.peek();
-        if (plexObject instanceof Section) {
-          loadSection((Section) plexObject);
-        }
+        loadItems();
       }
     }
   }
@@ -195,26 +224,14 @@ public class MainActivity extends AppCompatActivity {
   protected void sectionSelected(Section section) {
     displayStack.clear();
     displayStack.push(section);
-    loadSection(section);
+    loadItems();
     drawerLayout.closeDrawer(GravityCompat.START);
   }
 
   @Background
-  protected void loadSection(Section section) {
-    setTitle(section);
-    final List<Media> mediaList = plexClient.getSection(
-        server,
-        section.getKey(),
-        prefs.filterUnwatched().get());
-    mainAdapter.setItems(getMainItems(mediaList));
-  }
-
-  @Background
-  public void loadShow(Media media) {
-    setTitle(media);
-    displayStack.push(media);
-    final List<Media> seasons = plexClient.getShow(server, media.getKey());
-    mainAdapter.setItems(getMainItems(seasons));
+  protected void loadPlexObject(PlexObject plexObject) {
+    displayStack.push(plexObject);
+    loadItems();
   }
 
   @UiThread

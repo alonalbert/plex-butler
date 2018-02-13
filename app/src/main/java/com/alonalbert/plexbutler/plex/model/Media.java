@@ -1,6 +1,8 @@
 package com.alonalbert.plexbutler.plex.model;
 
+import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,6 +110,14 @@ public class Media extends PlexObject {
       }
     }
     return values;
+  }
+
+  @Override
+  public List<Media> load(PlexClientImpl plexClient, Server server, boolean unwatched) {
+    if (type == Type.SHOW) {
+      return plexClient.getShow(server, getKey(), unwatched);
+    }
+    throw new UnsupportedOperationException();
   }
 
   @Override
