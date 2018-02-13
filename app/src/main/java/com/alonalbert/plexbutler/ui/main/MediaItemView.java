@@ -135,7 +135,7 @@ public class MediaItemView extends MainItemView {
       unwatchedCount.setVisibility(VISIBLE);
     } else {
       unwatchedCount.setVisibility(GONE);
-      toggleWatched.setColorFilter(media.getViewCount() > 0 ? unwatchedColor : watchedColor);
+      toggleWatched.setColorFilter(media.getViewCount() == 0 ? unwatchedColor : watchedColor);
     }
   }
 
@@ -148,21 +148,28 @@ public class MediaItemView extends MainItemView {
 
   @Click(R.id.toggle_watched)
   protected void onImageClick() {
+    final boolean watched;
     if (media.getType() == SHOW) {
       final int leafCount = media.getLeafCount();
       final int numUnwatched = leafCount - media.getViewedLeafCount();
       if (numUnwatched == 0) {
         media.setViewedLeafCount(0);
+        watched = false;
       } else {
         media.setViewedLeafCount(leafCount);
+        watched = true;
       }
+
     } else {
       if (media.getViewCount() == 0) {
         media.setViewCount(1);
+        watched = true;
       } else {
         media.setViewCount(0);
+        watched = false;
       }
     }
+    ((MainActivity) getContext()).setWatched(media, watched);
     updatedWatchedToggle();
   }
 }

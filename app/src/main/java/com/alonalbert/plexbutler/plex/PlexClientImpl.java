@@ -27,6 +27,8 @@ import java.util.Map;
 public class PlexClientImpl {
   private static final String FILTER_UNWATCHED = "unwatched";
   private static final String FILTER_ALL = "all";
+  public static final String MARK_WATCHED = "scrobble";
+  public static final String MARK_UNWATCHED = "unscrobble";
 
   @RestService
   PlexClient plexClient;
@@ -101,5 +103,10 @@ public class PlexClientImpl {
         height,
         uri,
         authToken);
+  }
+
+  public void setWatched(Server server, Media media, boolean watched) {
+    plexClient.doAction(server.getAddress(), server.getPort(), watched ? MARK_WATCHED : MARK_UNWATCHED, media.getRatingKey());
+
   }
 }

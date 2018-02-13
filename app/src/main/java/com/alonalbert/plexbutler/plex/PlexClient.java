@@ -40,4 +40,7 @@ interface PlexClient {
 
   @Get("http://{address}:{port}{key}")
   MediaResponse getMedia(@Path String address, @Path int port, @Path String key);
+
+  @Get("http://{address}:{port}/:/{action}?identifier=com.plexapp.plugins.library&key={key}")
+  void doAction(@Path String address, @Path int port, @Path String action, @Path String key);
 }

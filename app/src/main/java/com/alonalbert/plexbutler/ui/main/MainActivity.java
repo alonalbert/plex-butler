@@ -248,6 +248,11 @@ public class MainActivity extends AppCompatActivity {
     return items;
   }
 
+  @Background
+  public void setWatched(Media media, boolean watched) {
+    plexClient.setWatched(server, media, watched);
+  }
+
   @EBean
   public static class SectionListAdapter extends BaseAdapter {
 

@@ -19,6 +19,7 @@ public class Media extends PlexObject {
     MOVIE,
   }
 
+  private String ratingKey;
   private Type type;
   private String parentTitle;
   private String grandparentTitle;
@@ -36,6 +37,10 @@ public class Media extends PlexObject {
 
   @SerializedName("Genre")
   private List<Genre> genres;
+
+  public String getRatingKey() {
+    return ratingKey;
+  }
 
   public Type getType() {
     return type;
