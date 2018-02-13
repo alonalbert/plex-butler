@@ -1,8 +1,10 @@
 package com.alonalbert.plexbutler.ui.main;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -109,19 +111,25 @@ public class MediaItemView extends MainItemView {
     updatedWatchedToggle();
   }
 
+  @SuppressLint("DefaultLocale")
   protected void updatedWatchedToggle() {
     if (media.getType() == SHOW) {
       final int leafCount = media.getLeafCount();
       final int numUnwatched = leafCount - media.getViewedLeafCount();
       final int color = numUnwatched > 0 ? unwatchedColor : watchedColor;
       toggleWatched.setColorFilter(color);
-      unwatchedCount.setTextColor(color);
+
       if (numUnwatched != 0) {
-        unwatchedCount.setText(getResources().getString(R.string.unwatched_count, numUnwatched, leafCount));
+        final String s = String.format("<font color=#%1$06x>%2$d</font><font color=#%3$06x>/%4$d</font>",
+            unwatchedColor & 0xFFFFFF, numUnwatched,
+            watchedColor & 0xFFFFFF, leafCount);
+        unwatchedCount.setText(Html.fromHtml(s));
       } else {
         unwatchedCount.setText(String.valueOf(leafCount));
       }
+      unwatchedCount.setVisibility(VISIBLE);
     } else {
+      unwatchedCount.setVisibility(GONE);
       toggleWatched.setColorFilter(media.getViewCount() > 0 ? unwatchedColor : watchedColor);
     }
   }

@@ -12,7 +12,7 @@
     <dimen name="list_item_height">96dp</dimen>
     <dimen name="list_item_padding">16dp</dimen>
     <dimen name="list_item_text_margin">12dp</dimen>
-    <dimen name="toggle_watched_padding">10dp</dimen>
+    <dimen name="toggle_watched_padding">4dp</dimen>
     <dimen name="section_item_size">72dp</dimen>
     <dimen name="section_item_image_size">68dp</dimen>
 </resources>

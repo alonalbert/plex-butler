@@ -66,16 +66,18 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/toggle_watched_state"
-        android:padding="@dimen/toggle_watched_padding"
-        android:src="@drawable/ic_action_watched"
+        android:src="@drawable/toggle_watched"
         />
 
     <TextView
         android:id="@+id/unwatched_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/toggle_watched_padding"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/toggle_watched"
+        android:textSize="@dimen/list_item_main_text_size"
+        android:textColor="@color/watched"
         android:text="@string/sample_unwatched_count"
         />
 
