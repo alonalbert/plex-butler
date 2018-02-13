@@ -54,6 +54,8 @@ public class ShowItemView extends MainItemView {
   public void bind(MainItem item) {
     final MediaItem mediaItem = (MediaItem) item;
     this.media = mediaItem.get();
+
+//    Glide.with(getContext()).load()
     image.setImageResource(R.drawable.library_type_show);
 
     title.setText(mediaItem.get().getTitle());
@@ -66,15 +68,19 @@ public class ShowItemView extends MainItemView {
   }
 
   private void updatedWatchedToggle() {
-    final int leafCount = media.getLeafCount();
-    final int numUnwatched = leafCount - media.getViewedLeafCount();
-    final int color = numUnwatched > 0 ? unwatchedColor : watchedColor;
-    toggleWatched.setColorFilter(color);
-    unwatchedCount.setTextColor(color);
-    if (numUnwatched != 0) {
-      unwatchedCount.setText(getResources().getString(R.string.unwatched_count, numUnwatched, leafCount));
+    if (media.getType() == SHOW) {
+      final int leafCount = media.getLeafCount();
+      final int numUnwatched = leafCount - media.getViewedLeafCount();
+      final int color = numUnwatched > 0 ? unwatchedColor : watchedColor;
+      toggleWatched.setColorFilter(color);
+      unwatchedCount.setTextColor(color);
+      if (numUnwatched != 0) {
+        unwatchedCount.setText(getResources().getString(R.string.unwatched_count, numUnwatched, leafCount));
+      } else {
+        unwatchedCount.setText(String.valueOf(leafCount));
+      }
     } else {
-      unwatchedCount.setText(String.valueOf(leafCount));
+      toggleWatched.setColorFilter(media.getViewCount() > 0 ? unwatchedColor : watchedColor);
     }
   }
   @Click(R.id.layout)
@@ -86,12 +92,20 @@ public class ShowItemView extends MainItemView {
 
   @Click(R.id.toggle_watched)
   protected void onImageClick() {
-    final int leafCount = media.getLeafCount();
-    final int numUnwatched = leafCount - media.getViewedLeafCount();
-    if (numUnwatched == 0) {
-      media.setViewedLeafCount(0);
+    if (media.getType() == SHOW) {
+      final int leafCount = media.getLeafCount();
+      final int numUnwatched = leafCount - media.getViewedLeafCount();
+      if (numUnwatched == 0) {
+        media.setViewedLeafCount(0);
+      } else {
+        media.setViewedLeafCount(leafCount);
+      }
     } else {
-      media.setViewedLeafCount(leafCount);
+      if (media.getViewCount() == 0) {
+        media.setViewCount(1);
+      } else {
+        media.setViewCount(0);
+      }
     }
     updatedWatchedToggle();
   }

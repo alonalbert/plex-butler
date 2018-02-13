@@ -4,8 +4,10 @@ import com.alonalbert.plexbutler.plex.model.LoginResponse;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Server;
+import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.springframework.util.LinkedMultiValueMap;
 
@@ -24,6 +26,9 @@ public class PlexClientImpl {
 
   @RestService
   PlexClient plexClient;
+
+  @Pref
+  PlexButlerPreferences_ prefs;
 
   public LoginResponse.User login(LinkedMultiValueMap<String, String> data) {
     return plexClient.login(data).getUser();

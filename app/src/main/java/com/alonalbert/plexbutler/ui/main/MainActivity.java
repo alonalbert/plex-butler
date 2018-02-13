@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
           return ShowItemView_.build(context);
 
         case MainItem.TYPE_MOVIE:
-          return MovieItemView_.build(context);
+          return ShowItemView_.build(context);
       }
       throw new UnsupportedOperationException("Unknown type: " + viewType);
     }
