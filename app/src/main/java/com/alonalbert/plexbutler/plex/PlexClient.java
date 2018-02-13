@@ -43,4 +43,7 @@ interface PlexClient {
 
   @Get("http://{address}:{port}/:/{action}?identifier=com.plexapp.plugins.library&key={key}")
   void doAction(@Path String address, @Path int port, @Path String action, @Path String key);
+
+  @Get("http://{address}:{port}/library/sections/{key}/refresh")
+  void scanLibrary(@Path String address, @Path int port, @Path String key);
 }

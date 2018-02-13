@@ -19,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClientImpl;
@@ -215,9 +214,13 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  @OptionsItem(R.id.settings)
-  public void settingsSelected() {
-    Toast.makeText(this, "Settings pressed", Toast.LENGTH_SHORT).show();
+  @Background
+  @OptionsItem(R.id.menu_scan)
+  public void scanLibrary() {
+    final PlexObject plexObject = displayStack.firstElement();
+    if (plexObject instanceof Section) {
+      plexClient.scanLibrary(server, ((Section) plexObject));
+    }
   }
 
   @ItemClick(R.id.section_list)

@@ -32,7 +32,8 @@
     <string name="episode_title">Season %1$d Episode %2$02d</string>
     <string name="year_and_rating">%1$d Rating: %2$s</string>
     <string name="aired_on">Aired on %1$s</string>
-    <string name="action_refresh">Refresh</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_scan">Scan library</string>
 
 
 </resources>

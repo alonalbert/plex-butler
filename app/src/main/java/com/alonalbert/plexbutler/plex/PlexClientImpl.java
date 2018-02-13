@@ -109,4 +109,8 @@ public class PlexClientImpl {
     plexClient.doAction(server.getAddress(), server.getPort(), watched ? MARK_WATCHED : MARK_UNWATCHED, media.getRatingKey());
 
   }
+
+  public void scanLibrary(Server server, Section section) {
+    plexClient.scanLibrary(server.getAddress(), server.getPort(), section.getKey());
+  }
 }
