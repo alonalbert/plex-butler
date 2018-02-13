@@ -119,20 +119,26 @@ public class MediaItemView extends MainItemView {
       final int color = numUnwatched > 0 ? unwatchedColor : watchedColor;
       toggleWatched.setColorFilter(color);
 
-      if (numUnwatched != 0) {
-        final String s = String.format("<font color=#%1$06x>%2$d</font><font color=#%3$06x>/%4$d</font>",
-            unwatchedColor & 0xFFFFFF, numUnwatched,
-            watchedColor & 0xFFFFFF, leafCount);
-        unwatchedCount.setText(Html.fromHtml(s));
+      final String text;
+      if (numUnwatched == 0) {
+        text = String.format("<font color=#%1$06x>%2$d</font>", watchedColor & 0xFFFFFF, leafCount);
       } else {
-        unwatchedCount.setText(String.valueOf(leafCount));
+        if (numUnwatched == leafCount) {
+          text = String.format("<font color=#%1$06x>%2$d</font>", unwatchedColor & 0xFFFFFF, leafCount);
+        } else {
+          text = String.format("<font color=#%1$06x>%2$d</font><font color=#%3$06x>/%4$d</font>",
+              unwatchedColor & 0xFFFFFF, numUnwatched,
+              watchedColor & 0xFFFFFF, leafCount);
+        }
       }
+      unwatchedCount.setText(Html.fromHtml(text));
       unwatchedCount.setVisibility(VISIBLE);
     } else {
       unwatchedCount.setVisibility(GONE);
       toggleWatched.setColorFilter(media.getViewCount() > 0 ? unwatchedColor : watchedColor);
     }
   }
+
   @Click(R.id.layout)
   protected void onItemClick() {
     if (media.getType() == SHOW) {
