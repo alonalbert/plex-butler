@@ -298,22 +298,11 @@ public class MainActivity extends AppCompatActivity {
   @EBean
   public static class MainAdapter extends AbstractRecyclerViewAdapter<MainItem, MainItemView> {
     @RootContext
-    Context context;
+    MainActivity mainActivity;
 
     @Override
     protected MainItemView onCreateItemView(ViewGroup parent, int viewType) {
-      // TODO: 2/12/18 Maybe all media items can use the same view?
-      switch (viewType) {
-        case MainItem.TYPE_SHOW:
-          return ShowItemView_.build(context);
-
-        case MainItem.TYPE_EPISODE:
-          return ShowItemView_.build(context);
-
-        case MainItem.TYPE_MOVIE:
-          return ShowItemView_.build(context);
-      }
-      throw new UnsupportedOperationException("Unknown type: " + viewType);
+        return MediaItemView_.build(mainActivity);
     }
 
     @Override
@@ -321,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
       MainItemView view = holder.getView();
       final MainItem item = items.get(position);
 
-      view.bind(item);
+      view.bind(item, mainActivity.server);
     }
 
     @UiThread

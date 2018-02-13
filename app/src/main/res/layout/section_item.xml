@@ -2,9 +2,8 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/section_item_size"
     android:gravity="top|bottom|center_vertical|fill_vertical|center|fill"
-    android:minHeight="@dimen/list_item_height"
     android:orientation="horizontal"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
@@ -12,8 +11,8 @@
 
     <ImageView
         android:id="@+id/section_image"
-        android:layout_width="@dimen/list_item_image_size"
-        android:layout_height="@dimen/list_item_image_size"
+        android:layout_width="@dimen/section_item_image_size"
+        android:layout_height="@dimen/section_item_image_size"
         android:layout_gravity="center_vertical"
         android:src="@drawable/library_type_show"
         android:contentDescription="@string/tv_show"

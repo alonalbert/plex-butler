@@ -7,9 +7,12 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="list_item_main_text_size">18sp</dimen>
     <dimen name="list_item_margin">20dp</dimen>
-    <dimen name="list_item_image_size">48dp</dimen>
-    <dimen name="list_item_height">72dp</dimen>
+    <dimen name="list_item_image_height">90dp</dimen>
+    <dimen name="list_item_image_width">60dp</dimen>
+    <dimen name="list_item_height">96dp</dimen>
     <dimen name="list_item_padding">16dp</dimen>
     <dimen name="list_item_text_margin">12dp</dimen>
     <dimen name="toggle_watched_padding">10dp</dimen>
+    <dimen name="section_item_size">72dp</dimen>
+    <dimen name="section_item_image_size">68dp</dimen>
 </resources>

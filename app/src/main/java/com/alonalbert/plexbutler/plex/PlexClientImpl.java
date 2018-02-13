@@ -1,5 +1,7 @@
 package com.alonalbert.plexbutler.plex;
 
+import android.annotation.SuppressLint;
+
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.Section;
@@ -11,6 +13,8 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.springframework.util.LinkedMultiValueMap;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,5 +72,25 @@ public class PlexClientImpl {
       episodes.addAll(plexClient.getMedia(address, port, season.getKey()).getItems());
     }
     return episodes;
+  }
+
+  @SuppressLint("DefaultLocale")
+  public String getPhotoUrl(Server server, String photoUri, int width, int height) {
+    final String authToken = prefs.plexAuthToken().get();
+    final String uri;
+    try {
+      uri = URLEncoder.encode(photoUri + "?X-Plex-Token=" + authToken, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      // Should not happen
+      throw new RuntimeException(e);
+    }
+
+    return String.format("http://%s:%d/photo/:/transcode?width=%d&height=%d&minSize=1&url=%s&X-Plex-Token=%s",
+        server.getAddress(),
+        server.getPort(),
+        width,
+        height,
+        uri,
+        authToken);
   }
 }

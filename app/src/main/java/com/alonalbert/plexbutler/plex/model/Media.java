@@ -21,6 +21,7 @@ public class Media extends PlexObject {
   private String parentTitle;
   private String grandparentTitle;
   private String summary;
+  private String rating;
   private int index;
   private int parentIndex;
   private String banner;
@@ -29,6 +30,7 @@ public class Media extends PlexObject {
   private int leafCount;
   private int viewedLeafCount;
   private int year;
+  private String originallyAvailableAt;
 
   @SerializedName("Genre")
   private List<Genre> genres;
@@ -47,6 +49,10 @@ public class Media extends PlexObject {
 
   public String getSummary() {
     return summary;
+  }
+
+  public String getRating() {
+    return rating;
   }
 
   public int getIndex() {
@@ -89,8 +95,13 @@ public class Media extends PlexObject {
     return year;
   }
 
+  public String getOriginallyAvailableAt() {
+    return originallyAvailableAt;
+  }
+
   public List<String> getGenres() {
     final ArrayList<String> values = new ArrayList<>();
+    //noinspection ConstantConditions
     if (genres != null) {
       for (Genre genre : genres) {
         values.add(genre.tag);
