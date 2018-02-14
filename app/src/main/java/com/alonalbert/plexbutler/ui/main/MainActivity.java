@@ -186,6 +186,15 @@ public class MainActivity extends AppCompatActivity {
     menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
   }
 
+  @Background
+  @OptionsItem(R.id.menu_scan)
+  public void scanLibrary() {
+    final PlexObject plexObject = displayStack.firstElement();
+    if (plexObject instanceof Section) {
+      plexClient.scanLibrary(server, ((Section) plexObject));
+    }
+  }
+
   @UiThread
   protected void setRefreshing(boolean refreshing) {
     swipeRefresh.setRefreshing(refreshing);
@@ -256,15 +265,6 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  @Background
-  @OptionsItem(R.id.menu_scan)
-  public void scanLibrary() {
-    final PlexObject plexObject = displayStack.firstElement();
-    if (plexObject instanceof Section) {
-      plexClient.scanLibrary(server, ((Section) plexObject));
-    }
-  }
-
   @ItemClick(R.id.section_list)
   protected void sectionSelected(Section section) {
     displayStack.clear();
@@ -296,6 +296,10 @@ public class MainActivity extends AppCompatActivity {
   @Background
   public void setMediaWatched(Media media, boolean watched) {
     plexClient.setWatched(server, media, watched);
+  }
+
+  public String getPhotoUrl(Server server, String thumb, int imageWidth, int imageHeight) {
+    return plexClient.getPhotoUrl(server, thumb, imageWidth, imageHeight);
   }
 
   @EBean
