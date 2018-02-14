@@ -131,7 +131,7 @@ public class MainFragment extends Fragment {
     @Pref
     protected PlexButlerPreferences_ prefs;
 
-    private List<Media> unwatchedItems = new ArrayList<>();
+    private final List<Media> unwatchedItems = new ArrayList<>();
     private boolean unwatchedOnly;
 
     @AfterInject
@@ -208,7 +208,7 @@ public class MainFragment extends Fragment {
     protected TextView toggleWatched;
 
     private Media media;
-    private MainActivity mainActivity;
+    private final MainActivity mainActivity;
 
     public ItemView(Context context) {
       super(context);
@@ -260,7 +260,7 @@ public class MainFragment extends Fragment {
     }
 
     @SuppressLint("DefaultLocale")
-    protected void updatedWatchedToggle() {
+    void updatedWatchedToggle() {
       if (media.getType() == SHOW) {
         final int leafCount = media.getLeafCount();
         final int numUnwatched = leafCount - media.getViewedLeafCount();

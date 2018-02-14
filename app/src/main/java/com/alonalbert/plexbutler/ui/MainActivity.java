@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
   void onServerSelected(Intent data) {
     server = new Server(
         data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
-        data.getStringExtra(ServerPickerActivity.EXTRA_NAME),
+        data.getStringExtra(ServerPickerActivity.EXTRA_ADDRESS),
         data.getIntExtra(ServerPickerActivity.EXTRA_PORT, 0));
     loadSections();
   }

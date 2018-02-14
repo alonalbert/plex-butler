@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Plex Butler</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -28,13 +28,15 @@
     <string name="year_example">2018</string>
     <string name="toggle_watched_state">Toggle watched state</string>
     <string name="sample_unwatched_count">3</string>
-    <string name="unwatched_count"><font color="#%1$06x">%2$d</font><font color="#%3$06x">/%4$d</font></string>
-    <string name="episode_title">Season %1$d Episode %2$02d</string>
-    <string name="year_and_rating">%1$d Rating: %2$s</string>
+    <string name="episode_title" tools:ignore="PluralsCandidate">Season %1$d Episode %2$02d</string>
+    <string name="year_and_rating" tools:ignore="PluralsCandidate">%1$d Rating: %2$s</string>
     <string name="aired_on">Aired on %1$s</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_scan">Scan library</string>
     <string name="menu_toggle_watched">Toggle watched</string>
+    <string name="show_name">Show name</string>
+    <string name="pick_server_title">Pick a Server</string>
+    <string name="fix_match">Fix Match</string>
 
 
 </resources>

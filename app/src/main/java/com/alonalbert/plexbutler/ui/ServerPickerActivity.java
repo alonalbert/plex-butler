@@ -35,6 +35,7 @@ public class ServerPickerActivity extends AppCompatActivity {
   public static final String EXTRA_NAME = "EXTRA_NAME";
   public static final String EXTRA_ADDRESS = "ADDRESS";
   public static final String EXTRA_PORT = "PORT";
+
   @ViewById(R.id.server_list)
   protected ListView serverList;
 

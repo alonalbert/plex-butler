@@ -30,8 +30,10 @@
             android:label="@string/title_activity_login" />
         <activity
             android:name=".ui.ServerPickerActivity_"
-            android:exported="true" />
-        <activity android:name=".ui.FixMatchActivity_"></activity>
+            android:label="@string/pick_server_title"/>
+        <activity
+            android:name=".ui.FixMatchActivity_"
+            android:label="@string/fix_match"/>
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ import org.androidannotations.annotations.sharedpreferences.SharedPref;
 /**
  * Shared preferences for Plex butler
  */
+@SuppressWarnings("unused")
 @SharedPref(SharedPref.Scope.UNIQUE)
 public interface PlexButlerPreferences {
   @DefaultString("")

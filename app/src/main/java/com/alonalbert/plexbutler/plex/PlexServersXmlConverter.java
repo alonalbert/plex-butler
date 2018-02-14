@@ -25,7 +25,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class PlexServersXmlConverter extends AbstractXmlHttpMessageConverter {
   private static final String TAG = "PlexButler";
-  private DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+  private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
   @Override
   protected Object readFromSource(Class clazz, HttpHeaders headers, Source source) throws IOException {

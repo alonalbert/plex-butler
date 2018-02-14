@@ -1,4 +1,4 @@
 #!/bin/sh
 #
 
-curl -H 'X-Plex-Token: YzfpN2WCTMq6PJnF3rcx' -H 'Accept: application/json' "$@" | python -mjson.tool
+curl -H "X-Plex-Token: $1" -H 'Accept: application/json' "$2" | python -mjson.tool

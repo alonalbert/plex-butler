@@ -3,6 +3,7 @@ package com.alonalbert.plexbutler.plex.model;
 /**
  * Response object to login request
  */
+@SuppressWarnings("unused")
 public class LoginResponse {
   private User user;
 

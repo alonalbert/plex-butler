@@ -1,7 +1,7 @@
 package com.alonalbert.plexbutler.plex.model;
 
 /**
- * A Plex Server Pojo
+ * A Plex Server Object
  */
 public class Server {
 
