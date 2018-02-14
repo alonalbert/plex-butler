@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler.ui.main;
+package com.alonalbert.plexbutler.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -36,13 +36,10 @@ import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
-import com.alonalbert.plexbutler.ui.login.LoginActivity_;
-import com.alonalbert.plexbutler.ui.main.MainActivity_.MediaItemView_;
-import com.alonalbert.plexbutler.ui.main.MainActivity_.SectionItemView_;
+import com.alonalbert.plexbutler.ui.MainActivity_.MediaItemView_;
+import com.alonalbert.plexbutler.ui.MainActivity_.SectionItemView_;
 import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
 import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
-import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity;
-import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity_;
 import com.google.common.collect.ImmutableMap;
 
 import org.androidannotations.annotations.AfterViews;

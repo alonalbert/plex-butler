@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler.ui.serverpicker;
+package com.alonalbert.plexbutler.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Server;
-import com.alonalbert.plexbutler.ui.serverpicker.ServerPickerActivity_.PlexServerItemView_;
+import com.alonalbert.plexbutler.ui.ServerPickerActivity_.PlexServerItemView_;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;

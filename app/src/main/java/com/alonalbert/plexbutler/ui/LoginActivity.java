@@ -1,4 +1,4 @@
-package com.alonalbert.plexbutler.ui.login;
+package com.alonalbert.plexbutler.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
