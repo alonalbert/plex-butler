@@ -12,11 +12,9 @@ import android.widget.TextView;
 import com.alonalbert.plexbutler.GlideApp;
 import com.alonalbert.plexbutler.GlideRequest;
 import com.alonalbert.plexbutler.R;
-import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.Server;
 
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.ViewById;
@@ -32,9 +30,6 @@ import static com.alonalbert.plexbutler.plex.model.Media.Type.SHOW;
  */
 @EViewGroup(R.layout.media_item)
 public class MediaItemView extends MainItemView {
-
-  @Bean
-  protected PlexClientImpl plexClient;
 
   @ViewById(R.id.image)
   protected ImageView image;
@@ -67,9 +62,11 @@ public class MediaItemView extends MainItemView {
   protected float imageHeight;
 
   private Media media;
+  private MainActivity mainActivity;
 
   public MediaItemView(Context context) {
     super(context);
+    mainActivity = ((MainActivity) getContext());
   }
 
   @Override
@@ -79,7 +76,7 @@ public class MediaItemView extends MainItemView {
     final int placeholder = media.getType() == MOVIE ? R.drawable.library_type_movie : R.drawable.library_type_show;
 
     if (media.getThumb() != null) {
-      final String photoUrl = plexClient.getPhotoUrl(server, media.getThumb(), (int) imageWidth, (int) imageHeight);
+      final String photoUrl = mainActivity.getPhotoUrl(server, media.getThumb(), (int) imageWidth, (int) imageHeight);
       final GlideRequest<Drawable> request = GlideApp
           .with(getContext())
           .load(photoUrl)
@@ -142,7 +139,7 @@ public class MediaItemView extends MainItemView {
   @Click(R.id.layout)
   protected void onItemClick() {
     if (media.getType() == SHOW) {
-      ((MainActivity) getContext()).loadPlexObject(media);
+      mainActivity.loadPlexObject(media);
     }
   }
 
@@ -169,7 +166,7 @@ public class MediaItemView extends MainItemView {
         watched = false;
       }
     }
-    ((MainActivity) getContext()).setMediaWatched(media, watched);
+    mainActivity.setMediaWatched(media, watched);
     updatedWatchedToggle();
   }
 }
