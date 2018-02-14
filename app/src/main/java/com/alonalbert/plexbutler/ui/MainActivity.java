@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -118,15 +120,6 @@ public class MainActivity extends AppCompatActivity {
   @OptionsMenuItem(R.id.menu_unwatched)
   protected MenuItem menuUnwatched;
 
-  @NonConfigurationInstance
-  protected Server server;
-
-  @NonConfigurationInstance
-  protected Section currentSection;
-
-  @NonConfigurationInstance
-  protected PlexObject currentPlexObject;
-
   @ColorRes(R.color.unwatched)
   protected int unwatchedColor;
 
@@ -149,6 +142,28 @@ public class MainActivity extends AppCompatActivity {
   private Boolean isUnwatchedFilterSet;
   private int sectionPosition;
 
+
+  @NonConfigurationInstance
+  protected Server server;
+
+  @NonConfigurationInstance
+  protected List<Media> items;
+
+  @NonConfigurationInstance
+  protected Section currentSection;
+
+  @NonConfigurationInstance
+  protected PlexObject currentPlexObject;
+
+  @Override
+  protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    if (items != null) {
+      mainAdapter.setItems(items);
+    }
+  }
+
   @AfterViews
   protected void afterViews() {
     setSupportActionBar(toolbar);
@@ -169,10 +184,15 @@ public class MainActivity extends AppCompatActivity {
     sectionList.setAdapter(sectionAdapter);
 
     final String authToken = prefs.plexAuthToken().get();
-    if (!authToken.isEmpty()) {
-      selectServer();
-    } else {
-      startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
+
+    if (items == null) {
+      if (!authToken.isEmpty()) {
+        if (server == null) {
+          selectServer();
+        }
+      } else {
+        startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
+      }
     }
 
     isUnwatchedFilterSet = prefs.filterUnwatched().get();
@@ -189,9 +209,15 @@ public class MainActivity extends AppCompatActivity {
   protected void loadItems(int position) {
     setTitle(currentPlexObject);
     setRefreshing(true);
-    mainAdapter.setItems(currentPlexObject.load(plexClient, server, false));
+    items = currentPlexObject.load(plexClient, server, false);
+    setMainAdapterItems();
     setRefreshing(false);
     scrollToPosition(position);
+  }
+
+  @UiThread
+  protected void setMainAdapterItems() {
+    mainAdapter.setItems(items);
   }
 
   @Background
@@ -297,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
   @Background
   protected void loadPlexObject(PlexObject plexObject) {
     currentPlexObject = plexObject;
-    sectionPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+    sectionPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
     loadItems(0);
   }
 
@@ -411,7 +437,6 @@ public class MainActivity extends AppCompatActivity {
       view.bind(item);
     }
 
-    @UiThread
     void setItems(List<Media> items) {
       this.items = items;
       unwatchedItems.clear();
@@ -473,15 +498,15 @@ public class MainActivity extends AppCompatActivity {
     public void bind(Media media) {
       this.media = media;
 
-      final int placeholder = this.media.getType() == MOVIE ? R.drawable.library_type_movie : R.drawable.library_type_show;
+      final int placeholder = media.getType() == MOVIE ? R.drawable.library_type_movie : R.drawable.library_type_show;
 
-      if (this.media.getThumb() != null) {
-        final String photoUrl = mainActivity.getPhotoUrl(this.media.getThumb());
+      if (media.getThumb() != null) {
+        final String photoUrl = mainActivity.getPhotoUrl(media.getThumb());
         final GlideRequest<Drawable> request = GlideApp
             .with(getContext())
             .load(photoUrl)
             .placeholder(placeholder);
-        if (this.media.getType() == EPISODE) {
+        if (media.getType() == EPISODE) {
           request.centerCrop();
         } else {
           request.fitCenter();
@@ -492,18 +517,24 @@ public class MainActivity extends AppCompatActivity {
       }
 
       final Resources res = getResources();
-      if (this.media.getType() == EPISODE) {
-        text1.setText(res.getString(R.string.episode_title, this.media.getParentIndex(), this.media.getIndex()));
-        text2.setText(this.media.getTitle());
-        text3.setText(res.getString(R.string.aired_on, this.media.getOriginallyAvailableAt()));
-      } else {
-        text1.setText(this.media.getTitle());
-        if (this.media.getRating() != null) {
-          text2.setText(res.getString(R.string.year_and_rating, this.media.getYear(), this.media.getRating()));
-        } else {
-          text2.setText(String.valueOf(this.media.getYear()));
+      if (media.getType() == EPISODE) {
+        text1.setText(res.getString(R.string.episode_title, media.getParentIndex(), media.getIndex()));
+        text2.setText(media.getTitle());
+        if (media.getOriginallyAvailableAt() != null) {
+          text3.setText(res.getString(R.string.aired_on, media.getOriginallyAvailableAt()));
         }
-        text3.setText(TextUtils.join(", ", this.media.getGenres()));
+      } else {
+        text1.setText(media.getTitle());
+        if (media.getRating() != null) {
+          if (media.getYear() > 0) {
+            text2.setText(res.getString(R.string.year_and_rating, media.getYear(), media.getRating()));
+          } else {
+            text2.setText(media.getRating());
+          }
+        } else {
+          text2.setText(String.valueOf(media.getYear()));
+        }
+        text3.setText(TextUtils.join(", ", media.getGenres()));
       }
       updatedWatchedToggle();
     }
