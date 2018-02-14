@@ -3,24 +3,12 @@ package com.alonalbert.plexbutler.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,11 +17,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.alonalbert.plexbutler.GlideApp;
-import com.alonalbert.plexbutler.GlideRequest;
 import com.alonalbert.plexbutler.R;
 import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Media;
@@ -42,19 +27,16 @@ import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Section.Type;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
-import com.alonalbert.plexbutler.ui.MainActivity_.MediaItemView_;
 import com.alonalbert.plexbutler.ui.MainActivity_.SectionItemView_;
-import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
-import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
 import com.google.common.collect.ImmutableMap;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.EViewGroup;
+import org.androidannotations.annotations.FragmentById;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.NonConfigurationInstance;
 import org.androidannotations.annotations.OnActivityResult;
@@ -69,17 +51,12 @@ import org.androidannotations.annotations.res.DimensionRes;
 import org.androidannotations.annotations.res.DrawableRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.alonalbert.plexbutler.plex.model.Media.Type.EPISODE;
-import static com.alonalbert.plexbutler.plex.model.Media.Type.MOVIE;
-import static com.alonalbert.plexbutler.plex.model.Media.Type.SHOW;
-
 @SuppressLint("Registered")
 @OptionsMenu(R.menu.main)
-@EActivity(R.layout.activity_main)
+@EActivity(R.layout.main_activity)
 public class MainActivity extends AppCompatActivity {
   @SuppressWarnings("unused")
   private static final String TAG = "PlexButler";
@@ -91,16 +68,10 @@ public class MainActivity extends AppCompatActivity {
   protected PlexButlerPreferences_ prefs;
 
   @Bean
-  protected SectionListAdapter sectionAdapter;
-
-  @Bean
-  protected MainAdapter mainAdapter;
-
-  @Bean
   protected PlexClientImpl plexClient;
 
-  @ViewById(R.id.swipe_refresh)
-  protected SwipeRefreshLayout swipeRefresh;
+  @Bean
+  protected SectionListAdapter sectionAdapter;
 
   @ViewById(R.id.toolbar)
   protected Toolbar toolbar;
@@ -114,24 +85,8 @@ public class MainActivity extends AppCompatActivity {
   @ViewById(R.id.section_list)
   protected ListView sectionList;
 
-  @ViewById(R.id.recycler_view)
-  protected RecyclerView recyclerView;
-
-  @OptionsMenuItem(R.id.menu_unwatched)
-  protected MenuItem menuUnwatched;
-
-  @ColorRes(R.color.unwatched)
-  protected int unwatchedColor;
-
-  @ColorRes(R.color.watched)
-  protected int watchedColor;
-
-  @DimensionRes(R.dimen.list_item_image_width)
-  protected float imageWidth;
-
-  @DimensionRes(R.dimen.list_item_image_height)
-  protected float imageHeight;
-
+  @FragmentById(R.id.main_fragment)
+  MainFragment mainFragment;
 
   @DrawableRes(R.drawable.watched_watched_24)
   protected Drawable iconWatched;
@@ -139,9 +94,20 @@ public class MainActivity extends AppCompatActivity {
   @DrawableRes(R.drawable.watched_unwatched_24)
   protected Drawable iconUnwatched;
 
-  private Boolean isUnwatchedFilterSet;
-  private int sectionPosition;
+  @DimensionRes(R.dimen.list_item_image_width)
+  protected float imageWidth;
 
+  @DimensionRes(R.dimen.list_item_image_height)
+  protected float imageHeight;
+
+  @ColorRes(R.color.unwatched)
+  protected int unwatchedColor;
+
+  @ColorRes(R.color.watched)
+  protected int watchedColor;
+
+  @OptionsMenuItem(R.id.menu_unwatched)
+  protected MenuItem menuUnwatched;
 
   @NonConfigurationInstance
   protected Server server;
@@ -155,14 +121,8 @@ public class MainActivity extends AppCompatActivity {
   @NonConfigurationInstance
   protected PlexObject currentPlexObject;
 
-  @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
-    if (items != null) {
-      mainAdapter.setItems(items);
-    }
-  }
+  @NonConfigurationInstance
+  protected int currentPosition;
 
   @AfterViews
   protected void afterViews() {
@@ -173,51 +133,25 @@ public class MainActivity extends AppCompatActivity {
     drawerLayout.addDrawerListener(toggle);
     toggle.syncState();
 
-    swipeRefresh.setOnRefreshListener(new OnRefreshListener() {
-      @Override
-      public void onRefresh() {
-        loadItems(-1);
-      }
-    });
-
-    recyclerView.setAdapter(mainAdapter);
     sectionList.setAdapter(sectionAdapter);
 
     final String authToken = prefs.plexAuthToken().get();
 
-    if (items == null) {
+    if (server == null) {
       if (!authToken.isEmpty()) {
-        if (server == null) {
-          selectServer();
-        }
+        selectServer();
       } else {
         startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
       }
     }
-
-    isUnwatchedFilterSet = prefs.filterUnwatched().get();
   }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    menuUnwatched.setChecked(isUnwatchedFilterSet);
-    menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
+    final boolean filterUnwatched = prefs.filterUnwatched().get();
+    menuUnwatched.setChecked(filterUnwatched);
+    menuUnwatched.setIcon(filterUnwatched ? iconUnwatched : iconWatched);
     return super.onCreateOptionsMenu(menu);
-  }
-
-  @Background
-  protected void loadItems(int position) {
-    setTitle(currentPlexObject);
-    setRefreshing(true);
-    items = currentPlexObject.load(plexClient, server, false);
-    setMainAdapterItems();
-    setRefreshing(false);
-    scrollToPosition(position);
-  }
-
-  @UiThread
-  protected void setMainAdapterItems() {
-    mainAdapter.setItems(items);
   }
 
   @Background
@@ -227,8 +161,8 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @OptionsItem(R.id.menu_refresh)
-  protected void menuRefresh() {
-    loadItems(0);
+  protected void refreshItems() {
+    mainFragment.loadItems(currentPlexObject, 0);
   }
 
   @OptionsItem(R.id.menu_unwatched)
@@ -236,16 +170,10 @@ public class MainActivity extends AppCompatActivity {
     final boolean newState = !menuUnwatched.isChecked();
     menuUnwatched.setChecked(newState);
     prefs.edit().filterUnwatched().put(newState).apply();
-    isUnwatchedFilterSet = newState;
-    mainAdapter.notifyDataSetChanged();
-    menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
+    mainFragment.adapter.notifyDataSetChanged(newState);
+    menuUnwatched.setIcon(newState ? iconUnwatched : iconWatched);
   }
 
-
-  @UiThread
-  protected void setRefreshing(boolean refreshing) {
-    swipeRefresh.setRefreshing(refreshing);
-  }
 
   @Background
   protected void selectServer() {
@@ -280,8 +208,12 @@ public class MainActivity extends AppCompatActivity {
     final List<Section> sections = plexClient.getSections(server);
     sectionAdapter.setSections(sections);
     final Section section = sections.get(0);
+    loadSection(section);
+  }
+
+  private void loadSection(Section section) {
     currentPlexObject = currentSection = section;
-    loadItems(0);
+    mainFragment.loadItems(section, 0);
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -307,29 +239,15 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
       } else {
         currentPlexObject = currentSection;
-        loadItems(sectionPosition);
+        mainFragment.loadItems(currentPlexObject, currentPosition);
       }
     }
   }
 
   @ItemClick(R.id.section_list)
   protected void sectionSelected(Section section) {
-    currentPlexObject = currentSection = section;
-    loadItems(0);
-    scrollToPosition(0);
+    loadSection(section);
     drawerLayout.closeDrawer(GravityCompat.START);
-  }
-
-  @Background
-  protected void loadPlexObject(PlexObject plexObject) {
-    currentPlexObject = plexObject;
-    sectionPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
-    loadItems(0);
-  }
-
-  @UiThread
-  protected void scrollToPosition(int position) {
-    ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
   }
 
   @UiThread
@@ -344,6 +262,12 @@ public class MainActivity extends AppCompatActivity {
 
   public String getPhotoUrl(String thumb) {
     return plexClient.getPhotoUrl(server, thumb, (int) imageWidth, (int) imageHeight);
+  }
+
+  public void loadShow(Media show) {
+    currentPlexObject = show;
+    currentPosition = mainFragment.getCurrentPosition();
+    mainFragment.loadItems(show, 0);
   }
 
   @EBean
@@ -414,197 +338,6 @@ public class MainActivity extends AppCompatActivity {
     public void bind(Section section) {
       section_title.setText(section.getTitle());
       section_image.setImageResource(SECTION_ICONS.get(section.getType()));
-    }
-  }
-
-  @EBean
-  public static class MainAdapter extends AbstractRecyclerViewAdapter<Media, MediaItemView> {
-    @RootContext
-    MainActivity mainActivity;
-
-    private List<Media> unwatchedItems = new ArrayList<>();
-
-    @Override
-    protected MediaItemView onCreateItemView(ViewGroup parent, int viewType) {
-      return MediaItemView_.build(mainActivity);
-    }
-
-    @Override
-    public void onBindViewHolder(ViewWrapper<MediaItemView> holder, int position) {
-      MediaItemView view = holder.getView();
-      final Media item = getItem(position);
-
-      view.bind(item);
-    }
-
-    void setItems(List<Media> items) {
-      this.items = items;
-      unwatchedItems.clear();
-      for (Media item : items) {
-        if (!item.isWatched()) {
-          unwatchedItems.add(item);
-        }
-      }
-      notifyDataSetChanged();
-    }
-
-    @Override
-    public int getItemCount() {
-      if (mainActivity.isUnwatchedFilterSet) {
-        return unwatchedItems.size();
-      } else {
-        return items.size();
-      }
-    }
-
-    private Media getItem(int position) {
-      if (mainActivity.isUnwatchedFilterSet) {
-        return unwatchedItems.get(position);
-      } else {
-        return items.get(position);
-      }
-    }
-  }
-
-  /**
-   * A MainItemView for a Shows
-   */
-  @EViewGroup(R.layout.media_item)
-  public static class MediaItemView extends RelativeLayout {
-
-    @ViewById(R.id.image)
-    protected ImageView image;
-
-    @ViewById(R.id.text1)
-    protected TextView text1;
-
-    @ViewById(R.id.text2)
-    protected TextView text2;
-
-    @ViewById(R.id.text3)
-    protected TextView text3;
-
-    @ViewById(R.id.toggle_watched)
-    protected TextView toggleWatched;
-
-    private Media media;
-    private MainActivity mainActivity;
-
-    public MediaItemView(Context context) {
-      super(context);
-      mainActivity = ((MainActivity) getContext());
-    }
-
-    public void bind(Media media) {
-      this.media = media;
-
-      final int placeholder = media.getType() == MOVIE ? R.drawable.library_type_movie : R.drawable.library_type_show;
-
-      if (media.getThumb() != null) {
-        final String photoUrl = mainActivity.getPhotoUrl(media.getThumb());
-        final GlideRequest<Drawable> request = GlideApp
-            .with(getContext())
-            .load(photoUrl)
-            .placeholder(placeholder);
-        if (media.getType() == EPISODE) {
-          request.centerCrop();
-        } else {
-          request.fitCenter();
-        }
-        request.into(image);
-      } else {
-        image.setImageResource(placeholder);
-      }
-
-      final Resources res = getResources();
-      if (media.getType() == EPISODE) {
-        text1.setText(res.getString(R.string.episode_title, media.getParentIndex(), media.getIndex()));
-        text2.setText(media.getTitle());
-        if (media.getOriginallyAvailableAt() != null) {
-          text3.setText(res.getString(R.string.aired_on, media.getOriginallyAvailableAt()));
-        }
-      } else {
-        text1.setText(media.getTitle());
-        if (media.getRating() != null) {
-          if (media.getYear() > 0) {
-            text2.setText(res.getString(R.string.year_and_rating, media.getYear(), media.getRating()));
-          } else {
-            text2.setText(media.getRating());
-          }
-        } else {
-          text2.setText(String.valueOf(media.getYear()));
-        }
-        text3.setText(TextUtils.join(", ", media.getGenres()));
-      }
-      updatedWatchedToggle();
-    }
-
-    @SuppressLint("DefaultLocale")
-    protected void updatedWatchedToggle() {
-      if (media.getType() == SHOW) {
-        final int leafCount = media.getLeafCount();
-        final int numUnwatched = leafCount - media.getViewedLeafCount();
-        setToggleUnwatchedColor(numUnwatched > 0);
-
-        if (numUnwatched == 0) {
-          toggleWatched.setText(String.valueOf(leafCount));
-          toggleWatched.setTextColor(mainActivity.watchedColor);
-        } else {
-          if (numUnwatched == leafCount) {
-            toggleWatched.setText(String.valueOf(leafCount));
-            toggleWatched.setTextColor(mainActivity.unwatchedColor);
-          } else {
-            final String source = numUnwatched + "/" + leafCount;
-            Spannable spannable = new SpannableString(source);
-            final int p = source.indexOf('/');
-            spannable.setSpan(new ForegroundColorSpan(mainActivity.unwatchedColor), 0, p, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(mainActivity.watchedColor), p + 1, source.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            toggleWatched.setText(spannable);
-          }
-        }
-      } else {
-        toggleWatched.setText("");
-        setToggleUnwatchedColor(media.getViewCount() == 0);
-      }
-    }
-
-    private void setToggleUnwatchedColor(boolean isUnwatched) {
-      final int color = isUnwatched ? mainActivity.unwatchedColor : mainActivity.watchedColor;
-      toggleWatched.getCompoundDrawablesRelative()[2].setColorFilter(color, Mode.SRC_ATOP);
-    }
-
-    @Click(R.id.layout)
-    protected void onItemClick() {
-      if (media.getType() == SHOW) {
-        mainActivity.loadPlexObject(media);
-      }
-    }
-
-    @Click(R.id.toggle_watched)
-    protected void onImageClick() {
-      final boolean watched;
-      if (media.getType() == SHOW) {
-        final int leafCount = media.getLeafCount();
-        final int numUnwatched = leafCount - media.getViewedLeafCount();
-        if (numUnwatched == 0) {
-          media.setViewedLeafCount(0);
-          watched = false;
-        } else {
-          media.setViewedLeafCount(leafCount);
-          watched = true;
-        }
-
-      } else {
-        if (media.getViewCount() == 0) {
-          media.setViewCount(1);
-          watched = true;
-        } else {
-          media.setViewCount(0);
-          watched = false;
-        }
-      }
-      mainActivity.setMediaWatched(media, watched);
-      updatedWatchedToggle();
     }
   }
 }

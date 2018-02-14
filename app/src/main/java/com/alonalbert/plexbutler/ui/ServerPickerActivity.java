@@ -29,7 +29,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 @SuppressLint("Registered")
-@EActivity(R.layout.activity_server_picker)
+@EActivity(R.layout.server_picker_activity)
 public class ServerPickerActivity extends AppCompatActivity {
 
   public static final String EXTRA_NAME = "EXTRA_NAME";

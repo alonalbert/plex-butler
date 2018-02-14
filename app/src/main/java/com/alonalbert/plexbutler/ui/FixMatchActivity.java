@@ -6,7 +6,7 @@ import com.alonalbert.plexbutler.R;
 
 import org.androidannotations.annotations.EActivity;
 
-@EActivity(R.layout.activity_fix_match)
+@EActivity(R.layout.fix_match_activity)
 public class FixMatchActivity extends AppCompatActivity {
 
 }

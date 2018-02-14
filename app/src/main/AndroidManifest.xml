@@ -31,7 +31,7 @@
         <activity
             android:name=".ui.ServerPickerActivity_"
             android:exported="true" />
-        <activity android:name=".ui.FixMatchActivity"></activity>
+        <activity android:name=".ui.FixMatchActivity_"></activity>
     </application>
 
 </manifest>

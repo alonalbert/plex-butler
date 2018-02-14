@@ -37,7 +37,7 @@ import org.springframework.web.client.HttpClientErrorException;
  * A login screen that offers login via email/password.
  */
 @SuppressLint("Registered")
-@EActivity(R.layout.activity_login)
+@EActivity(R.layout.login_activity)
 public class LoginActivity extends AppCompatActivity {
 
   @Pref
