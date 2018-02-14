@@ -12,6 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -69,7 +70,6 @@ import org.androidannotations.annotations.sharedpreferences.Pref;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import static com.alonalbert.plexbutler.plex.model.Media.Type.EPISODE;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.MOVIE;
@@ -122,7 +122,10 @@ public class MainActivity extends AppCompatActivity {
   protected Server server;
 
   @NonConfigurationInstance
-  protected Stack<PlexObject> displayStack = new Stack<>();
+  protected Section currentSection;
+
+  @NonConfigurationInstance
+  protected PlexObject currentPlexObject;
 
   @ColorRes(R.color.unwatched)
   protected int unwatchedColor;
@@ -144,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
   protected Drawable iconUnwatched;
 
   private Boolean isUnwatchedFilterSet;
+  private int sectionPosition;
 
   @AfterViews
   protected void afterViews() {
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
     swipeRefresh.setOnRefreshListener(new OnRefreshListener() {
       @Override
       public void onRefresh() {
-        loadItems();
+        loadItems(-1);
       }
     });
 
@@ -182,13 +186,23 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Background
-  @OptionsItem(R.id.menu_refresh)
-  protected void loadItems() {
-    final PlexObject plexObject = displayStack.peek();
-    setTitle(plexObject);
+  protected void loadItems(int position) {
+    setTitle(currentPlexObject);
     setRefreshing(true);
-    mainAdapter.setItems(plexObject.load(plexClient, server, false));
+    mainAdapter.setItems(currentPlexObject.load(plexClient, server, false));
     setRefreshing(false);
+    scrollToPosition(position);
+  }
+
+  @Background
+  @OptionsItem(R.id.menu_scan)
+  public void scanLibrary() {
+    plexClient.scanLibrary(server, currentSection);
+  }
+
+  @OptionsItem(R.id.menu_refresh)
+  protected void menuRefresh() {
+    loadItems(0);
   }
 
   @OptionsItem(R.id.menu_unwatched)
@@ -201,14 +215,6 @@ public class MainActivity extends AppCompatActivity {
     menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
   }
 
-  @Background
-  @OptionsItem(R.id.menu_scan)
-  public void scanLibrary() {
-    final PlexObject plexObject = displayStack.firstElement();
-    if (plexObject instanceof Section) {
-      plexClient.scanLibrary(server, ((Section) plexObject));
-    }
-  }
 
   @UiThread
   protected void setRefreshing(boolean refreshing) {
@@ -248,8 +254,8 @@ public class MainActivity extends AppCompatActivity {
     final List<Section> sections = plexClient.getSections(server);
     sectionAdapter.setSections(sections);
     final Section section = sections.get(0);
-    displayStack.push(section);
-    loadItems();
+    currentPlexObject = currentSection = section;
+    loadItems(0);
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -271,27 +277,33 @@ public class MainActivity extends AppCompatActivity {
     if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
       drawerLayout.closeDrawer(GravityCompat.START);
     } else {
-      displayStack.pop();
-      if (displayStack.empty()) {
+      if (currentPlexObject == currentSection) {
         super.onBackPressed();
       } else {
-        loadItems();
+        currentPlexObject = currentSection;
+        loadItems(sectionPosition);
       }
     }
   }
 
   @ItemClick(R.id.section_list)
   protected void sectionSelected(Section section) {
-    displayStack.clear();
-    displayStack.push(section);
-    loadItems();
+    currentPlexObject = currentSection = section;
+    loadItems(0);
+    scrollToPosition(0);
     drawerLayout.closeDrawer(GravityCompat.START);
   }
 
   @Background
   protected void loadPlexObject(PlexObject plexObject) {
-    displayStack.push(plexObject);
-    loadItems();
+    currentPlexObject = plexObject;
+    sectionPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+    loadItems(0);
+  }
+
+  @UiThread
+  protected void scrollToPosition(int position) {
+    ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
   }
 
   @UiThread

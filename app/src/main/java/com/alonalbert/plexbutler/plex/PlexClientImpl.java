@@ -27,8 +27,8 @@ import java.util.Map;
 public class PlexClientImpl {
   private static final String FILTER_UNWATCHED = "unwatched";
   private static final String FILTER_ALL = "all";
-  public static final String MARK_WATCHED = "scrobble";
-  public static final String MARK_UNWATCHED = "unscrobble";
+  private static final String MARK_WATCHED = "scrobble";
+  private static final String MARK_UNWATCHED = "unscrobble";
 
   @RestService
   PlexClient plexClient;
