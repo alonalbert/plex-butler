@@ -98,13 +98,9 @@ public class PlexClientImpl {
       throw new RuntimeException(e);
     }
 
-    return String.format("http://%s:%d/photo/:/transcode?width=%d&height=%d&minSize=1&url=%s&X-Plex-Token=%s",
-        server.getAddress(),
-        server.getPort(),
-        width,
-        height,
-        uri,
-        authToken);
+    return "http://" + server.getAddress() + ":" + server.getPort()
+        + "/photo/:/transcode?width=" + width + "&height=" + height + "&minSize=1&url=" + uri
+        + "&X-Plex-Token=" + authToken;
   }
 
   public void setWatched(Server server, Media media, boolean watched) {

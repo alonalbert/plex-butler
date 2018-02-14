@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,8 +14,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -385,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected MediaItemView onCreateItemView(ViewGroup parent, int viewType) {
-        return MediaItemView_.build(mainActivity);
+      return MediaItemView_.build(mainActivity);
     }
 
     @Override
@@ -445,10 +448,7 @@ public class MainActivity extends AppCompatActivity {
     protected TextView text3;
 
     @ViewById(R.id.toggle_watched)
-    protected ImageView toggleWatched;
-
-    @ViewById(R.id.unwatched_count)
-    protected TextView unwatchedCount;
+    protected TextView toggleWatched;
 
     private Media media;
     private MainActivity mainActivity;
@@ -501,27 +501,33 @@ public class MainActivity extends AppCompatActivity {
       if (media.getType() == SHOW) {
         final int leafCount = media.getLeafCount();
         final int numUnwatched = leafCount - media.getViewedLeafCount();
-        final int color = numUnwatched > 0 ? mainActivity.unwatchedColor : mainActivity.watchedColor;
-        toggleWatched.setColorFilter(color);
+        setToggleUnwatchedColor(numUnwatched > 0);
 
-        final String text;
         if (numUnwatched == 0) {
-          text = String.format("<font color=#%1$06x>%2$d</font>", mainActivity.watchedColor & 0xFFFFFF, leafCount);
+          toggleWatched.setText(String.valueOf(leafCount));
+          toggleWatched.setTextColor(mainActivity.watchedColor);
         } else {
           if (numUnwatched == leafCount) {
-            text = String.format("<font color=#%1$06x>%2$d</font>", mainActivity.unwatchedColor & 0xFFFFFF, leafCount);
+            toggleWatched.setText(String.valueOf(leafCount));
+            toggleWatched.setTextColor(mainActivity.unwatchedColor);
           } else {
-            text = String.format("<font color=#%1$06x>%2$d</font><font color=#%3$06x>/%4$d</font>",
-                mainActivity.unwatchedColor & 0xFFFFFF, numUnwatched,
-                mainActivity.watchedColor & 0xFFFFFF, leafCount);
+            final String source = numUnwatched + "/" + leafCount;
+            Spannable spannable = new SpannableString(source);
+            final int p = source.indexOf('/');
+            spannable.setSpan(new ForegroundColorSpan(mainActivity.unwatchedColor), 0, p, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(new ForegroundColorSpan(mainActivity.watchedColor), p + 1, source.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            toggleWatched.setText(spannable);
           }
         }
-        unwatchedCount.setText(Html.fromHtml(text));
-        unwatchedCount.setVisibility(VISIBLE);
       } else {
-        unwatchedCount.setVisibility(GONE);
-        toggleWatched.setColorFilter(media.getViewCount() == 0 ? mainActivity.unwatchedColor : mainActivity.watchedColor);
+        toggleWatched.setText("");
+        setToggleUnwatchedColor(media.getViewCount() == 0);
       }
+    }
+
+    private void setToggleUnwatchedColor(boolean isUnwatched) {
+      final int color = isUnwatched ? mainActivity.unwatchedColor : mainActivity.watchedColor;
+      toggleWatched.getCompoundDrawablesRelative()[2].setColorFilter(color, Mode.SRC_ATOP);
     }
 
     @Click(R.id.layout)
