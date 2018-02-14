@@ -5,7 +5,7 @@ import com.alonalbert.plexbutler.plex.model.Media;
 /**
  * A MainItem for a Media
  */
-public class MediaItem implements MainItem<Media> {
+public class MediaItem implements MainItem {
   private Media media;
 
   public MediaItem(Media media) {
@@ -30,5 +30,10 @@ public class MediaItem implements MainItem<Media> {
       default:
         throw new IllegalStateException();
     }
+  }
+
+  @Override
+  public boolean isWatched() {
+    return media.isWatched();
   }
 }

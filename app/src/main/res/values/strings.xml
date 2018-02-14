@@ -34,6 +34,7 @@
     <string name="aired_on">Aired on %1$s</string>
     <string name="menu_refresh">Refresh</string>
     <string name="menu_scan">Scan library</string>
+    <string name="menu_toggle_watched">Toggle watched</string>
 
 
 </resources>

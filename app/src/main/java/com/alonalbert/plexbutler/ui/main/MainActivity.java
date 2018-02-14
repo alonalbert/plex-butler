@@ -3,6 +3,7 @@ package com.alonalbert.plexbutler.ui.main;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +13,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -47,9 +50,12 @@ import org.androidannotations.annotations.NonConfigurationInstance;
 import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
+import org.androidannotations.annotations.OptionsMenuItem;
 import org.androidannotations.annotations.RootContext;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.ColorRes;
+import org.androidannotations.annotations.res.DrawableRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.util.ArrayList;
@@ -61,6 +67,7 @@ import java.util.Stack;
 @OptionsMenu(R.menu.main)
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
+  @SuppressWarnings("unused")
   private static final String TAG = "PlexButler";
 
   private static final int LOGIN_REQUEST_CODE = 0;
@@ -96,14 +103,31 @@ public class MainActivity extends AppCompatActivity {
   @ViewById(R.id.recycler_view)
   protected RecyclerView recyclerView;
 
+  @OptionsMenuItem(R.id.menu_unwatched)
+  protected MenuItem menuUnwatched;
+
   @NonConfigurationInstance
   protected Server server;
 
   @NonConfigurationInstance
   protected Stack<PlexObject> displayStack = new Stack<>();
 
+  @ColorRes(R.color.unwatched)
+  protected int unwatchedColor;
+
+  @ColorRes(R.color.watched)
+  protected int watchedColor;
+
+  @DrawableRes(R.drawable.menu_toggle_watched)
+  protected Drawable iconWatched;
+
+  @DrawableRes(R.drawable.menu_toggle_unwatched)
+  protected Drawable iconUnwatched;
+
+  private Boolean isUnwatchedFilterSet;
+
   @AfterViews
-  protected void initialize() {
+  protected void afterViews() {
     setSupportActionBar(toolbar);
 
     final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -127,8 +151,16 @@ public class MainActivity extends AppCompatActivity {
     } else {
       startActivityForResult(new Intent(this, LoginActivity_.class), LOGIN_REQUEST_CODE);
     }
+
+    isUnwatchedFilterSet = prefs.filterUnwatched().get();
   }
 
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    menuUnwatched.setChecked(isUnwatchedFilterSet);
+    menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
+    return super.onCreateOptionsMenu(menu);
+  }
 
   @Background
   @OptionsItem(R.id.menu_refresh)
@@ -139,9 +171,19 @@ public class MainActivity extends AppCompatActivity {
     final List<Media> mediaList = plexObject.load(
         plexClient,
         server,
-        prefs.filterUnwatched().get());
+        false);
     mainAdapter.setItems(getMainItems(mediaList));
     setRefreshing(false);
+  }
+
+  @OptionsItem(R.id.menu_unwatched)
+  protected void menuToggleWatched() {
+    final boolean newState = !menuUnwatched.isChecked();
+    menuUnwatched.setChecked(newState);
+    prefs.edit().filterUnwatched().put(newState);
+    isUnwatchedFilterSet = newState;
+    mainAdapter.notifyDataSetChanged();
+    menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
   }
 
   @UiThread
@@ -332,6 +374,8 @@ public class MainActivity extends AppCompatActivity {
     @RootContext
     MainActivity mainActivity;
 
+    private List<MainItem> unwatchedItems = new ArrayList<>();
+
     @Override
     protected MainItemView onCreateItemView(ViewGroup parent, int viewType) {
         return MediaItemView_.build(mainActivity);
@@ -340,20 +384,42 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBindViewHolder(ViewWrapper<MainItemView> holder, int position) {
       MainItemView view = holder.getView();
-      final MainItem item = items.get(position);
+      final MainItem item = getItem(position);
 
       view.bind(item, mainActivity.server);
     }
 
     @UiThread
-    protected void setItems(List<MainItem> items) {
+    void setItems(List<MainItem> items) {
       this.items = items;
+      for (MainItem item : items) {
+        if (!item.isWatched()) {
+          unwatchedItems.add(item);
+        }
+      }
       notifyDataSetChanged();
     }
 
     @Override
     public int getItemViewType(int position) {
-      return items.get(position).getType();
+      return getItem(position).getType();
+    }
+
+    @Override
+    public int getItemCount() {
+      if (mainActivity.isUnwatchedFilterSet) {
+        return unwatchedItems.size();
+      } else {
+        return items.size();
+      }
+    }
+
+    private MainItem getItem(int position) {
+      if (mainActivity.isUnwatchedFilterSet) {
+        return unwatchedItems.get(position);
+      } else {
+        return items.get(position);
+      }
     }
   }
 }

@@ -125,6 +125,9 @@ public class Media extends PlexObject {
     throw new UnsupportedOperationException();
   }
 
+  public boolean isWatched() {
+    return type == Type.SHOW ? viewedLeafCount == leafCount : viewCount > 0;
+  }
   @Override
   public String toString() {
     return "Media: " + getTitle();
