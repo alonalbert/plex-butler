@@ -169,7 +169,7 @@ public class MediaItemView extends MainItemView {
         watched = false;
       }
     }
-    ((MainActivity) getContext()).setWatched(media, watched);
+    ((MainActivity) getContext()).setMediaWatched(media, watched);
     updatedWatchedToggle();
   }
 }

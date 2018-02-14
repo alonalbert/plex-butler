@@ -118,10 +118,10 @@ public class MainActivity extends AppCompatActivity {
   @ColorRes(R.color.watched)
   protected int watchedColor;
 
-  @DrawableRes(R.drawable.menu_toggle_watched)
+  @DrawableRes(R.drawable.watched_watched_24)
   protected Drawable iconWatched;
 
-  @DrawableRes(R.drawable.menu_toggle_unwatched)
+  @DrawableRes(R.drawable.watched_unwatched_24)
   protected Drawable iconUnwatched;
 
   private Boolean isUnwatchedFilterSet;
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
   protected void menuToggleWatched() {
     final boolean newState = !menuUnwatched.isChecked();
     menuUnwatched.setChecked(newState);
-    prefs.edit().filterUnwatched().put(newState);
+    prefs.edit().filterUnwatched().put(newState).apply();
     isUnwatchedFilterSet = newState;
     mainAdapter.notifyDataSetChanged();
     menuUnwatched.setIcon(isUnwatchedFilterSet ? iconUnwatched : iconWatched);
@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Background
-  public void setWatched(Media media, boolean watched) {
+  public void setMediaWatched(Media media, boolean watched) {
     plexClient.setWatched(server, media, watched);
   }
 
@@ -392,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
     @UiThread
     void setItems(List<MainItem> items) {
       this.items = items;
+      unwatchedItems.clear();
       for (MainItem item : items) {
         if (!item.isWatched()) {
           unwatchedItems.add(item);
