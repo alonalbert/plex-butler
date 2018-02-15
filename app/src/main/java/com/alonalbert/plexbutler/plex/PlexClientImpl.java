@@ -11,6 +11,7 @@ import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
@@ -125,5 +126,10 @@ public class PlexClientImpl {
         key,
         match.getGuid(),
         match.getName());
+  }
+
+  @Background
+  public void unmatch(Server server, String key) {
+    plexClient.unmatch(server.getAddress(), server.getPort(), key);
   }
 }

@@ -12,6 +12,7 @@ import org.androidannotations.rest.spring.annotations.Header;
 import org.androidannotations.rest.spring.annotations.Headers;
 import org.androidannotations.rest.spring.annotations.Path;
 import org.androidannotations.rest.spring.annotations.Post;
+import org.androidannotations.rest.spring.annotations.Put;
 import org.androidannotations.rest.spring.annotations.Rest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -53,4 +54,7 @@ interface PlexClient {
 
   @Get("http://{address}:{port}/library/metadata/{key}/match?guid={guid}&name={name}")
   void setMatch(@Path String address, @Path int port, @Path String key, @Path String guid, @Path String name);
+
+  @Put("http://{address}:{port}/library/metadata/{key}/unmatch")
+  void unmatch(@Path String address, @Path int port, @Path String key);
 }

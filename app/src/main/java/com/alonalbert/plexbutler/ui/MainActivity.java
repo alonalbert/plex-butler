@@ -51,6 +51,7 @@ import org.androidannotations.annotations.res.DimensionRes;
 import org.androidannotations.annotations.res.DrawableRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -286,6 +287,12 @@ public class MainActivity extends AppCompatActivity {
     currentPlexObject = show;
     currentPosition = mainFragment.getCurrentPosition();
     loadItems(show, 0);
+  }
+
+  public void loadMovie(Media media) {
+    currentPlexObject = media;
+    currentPosition = mainFragment.getCurrentPosition();
+    mainFragment.setItems(media, new ArrayList<Media>());
   }
 
   @EBean

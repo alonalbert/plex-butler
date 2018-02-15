@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,7 +29,8 @@ import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.PlexObject;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
-import com.alonalbert.plexbutler.ui.MainFragment_.ItemView_;
+import com.alonalbert.plexbutler.ui.MainFragment_.HeaderItemView_;
+import com.alonalbert.plexbutler.ui.MainFragment_.RowItemView_;
 import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
 import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
 
@@ -119,17 +121,25 @@ public class MainFragment extends Fragment {
     }
   }
 
+  public void setItems(Media parent, List<Media> items) {
+    adapter.setItems(parent, items);
+  }
+
   int getCurrentPosition() {
     return layoutManager.findFirstCompletelyVisibleItemPosition();
   }
 
   @EBean
   public static class Adapter extends AbstractRecyclerViewAdapter<Media, ItemView> {
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ROW = 1;
+
     @Pref
     protected PlexButlerPreferences_ prefs;
 
     private final List<Media> unwatchedItems = new ArrayList<>();
     private boolean unwatchedOnly;
+    private boolean hasHeader;
 
     @AfterInject
     void afterInject() {
@@ -138,7 +148,11 @@ public class MainFragment extends Fragment {
 
     @Override
     protected ItemView onCreateItemView(ViewGroup parent, int viewType) {
-      return ItemView_.build(parent.getContext());
+      if (viewType == TYPE_HEADER) {
+        return HeaderItemView_.build(parent.getContext());
+      } else {
+        return RowItemView_.build(parent.getContext());
+      }
     }
 
     @Override
@@ -157,6 +171,9 @@ public class MainFragment extends Fragment {
     private void setItems(PlexObject parent, List<Media> items) {
       if (parent instanceof Media) {
         items.add(0, (Media) parent);
+        hasHeader = true;
+      } else {
+        hasHeader = false;
       }
       this.items = items;
       unwatchedItems.clear();
@@ -184,13 +201,86 @@ public class MainFragment extends Fragment {
         return items.get(position);
       }
     }
+
+    @Override
+    public int getItemViewType(int position) {
+      if (hasHeader) {
+        return position == 0 ? TYPE_HEADER : TYPE_ROW;
+      } else {
+        return TYPE_ROW;
+      }
+    }
+  }
+
+  static abstract class ItemView extends RelativeLayout {
+    public ItemView(Context context) {
+      super(context);
+    }
+
+    public abstract void bind(Media media);
+  }
+
+  /**
+   * A MainItemView for a Shows
+   */
+  @EViewGroup(R.layout.header_item)
+  public static class HeaderItemView extends ItemView {
+
+    @ViewById(R.id.image)
+    protected ImageView image;
+
+
+    private Media media;
+    private final MainActivity mainActivity;
+
+    public HeaderItemView(Context context) {
+      super(context);
+      mainActivity = ((MainActivity) getContext());
+    }
+
+    @Override
+    public void bind(Media media) {
+      this.media = media;
+
+      final int placeholder = media.getType() == MOVIE ? R.drawable.library_type_movie : R.drawable.library_type_show;
+
+      if (media.getArt() != null) {
+        final String photoUrl = mainActivity.getPhotoUrl(media.getArt());
+        GlideApp
+            .with(getContext())
+            .load(photoUrl)
+            .placeholder(placeholder)
+            .fitCenter()
+            .into(image);
+      } else {
+        image.setImageResource(placeholder);
+      }
+    }
+
+    @Click(R.id.unmatch)
+    protected void unmatch() {
+      mainActivity.plexClient.unmatch(mainActivity.server, media.getRatingKey());
+      Snackbar.make(this, getResources().getString(R.string.unmatched_snack, media.getTitle()), Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Click(R.id.fix_match)
+    protected void fixMatch() {
+      mainActivity.startActivity(new Intent(mainActivity, FixMatchActivity_.class)
+          .putExtra(EXTRA_SERVER, mainActivity.server)
+          .putExtra(EXTRA_KEY, media.getRatingKey())
+          .putExtra(EXTRA_AGENT, mainActivity.currentSection.getAgent())
+          .putExtra(EXTRA_TITLE, media.getTitle())
+          .putExtra(EXTRA_YEAR, media.getYear())
+          .putExtra(EXTRA_PLACEHOLDER, media.getType() == SHOW ? R.drawable.library_type_video : R.drawable.library_type_movie)
+      );
+    }
   }
 
   /**
    * A MainItemView for a Shows
    */
   @EViewGroup(R.layout.media_item)
-  public static class ItemView extends RelativeLayout {
+  public static class RowItemView extends ItemView {
 
     @ViewById(R.id.image)
     protected ImageView image;
@@ -210,11 +300,12 @@ public class MainFragment extends Fragment {
     private Media media;
     private final MainActivity mainActivity;
 
-    public ItemView(Context context) {
+    public RowItemView(Context context) {
       super(context);
       mainActivity = ((MainActivity) getContext());
     }
 
+    @Override
     public void bind(Media media) {
       this.media = media;
 
@@ -295,8 +386,16 @@ public class MainFragment extends Fragment {
 
     @Click(R.id.layout)
     protected void onItemClick() {
-      if (media.getType() == SHOW) {
-        mainActivity.loadShow(media);
+      switch (media.getType()) {
+        case SHOW:
+          mainActivity.loadShow(media);
+          break;
+        case MOVIE:
+          mainActivity.loadMovie(media);
+          break;
+        case SEASON:
+        case EPISODE:
+          break;
       }
     }
 

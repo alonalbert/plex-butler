@@ -29,6 +29,7 @@ public class Media extends PlexObject {
   private int parentIndex;
   private String banner;
   private String thumb;
+  private String art;
   private int viewCount;
   private int leafCount;
   private int viewedLeafCount;
@@ -76,6 +77,10 @@ public class Media extends PlexObject {
 
   public String getThumb() {
     return thumb;
+  }
+
+  public String getArt() {
+    return art;
   }
 
   public int getViewCount() {

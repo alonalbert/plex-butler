@@ -41,4 +41,6 @@
     <string name="search">Search</string>
     <string name="year">Year</string>
     <string name="score">Score: %d</string>
+    <string name="unmatch">Unmatch</string>
+    <string name="unmatched_snack">Unmatched %s</string>
 </resources>
