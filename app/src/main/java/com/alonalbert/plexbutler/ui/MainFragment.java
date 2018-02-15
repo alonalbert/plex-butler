@@ -34,7 +34,6 @@ import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EBean;
@@ -87,8 +86,12 @@ public class MainFragment extends Fragment {
   public void onAttach(Context context) {
     super.onAttach(context);
     mainActivity = ((MainActivity) context);
+  }
+
+  @AfterInject
+  protected void afterInject() {
     if (mainActivity.items != null) {
-      adapter.setItems(mainActivity.items);
+      adapter.setItems(mainActivity.currentPlexObject, mainActivity.items);
     }
   }
 
@@ -105,32 +108,19 @@ public class MainFragment extends Fragment {
     layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
   }
 
-  @Background
-  protected void loadItems(PlexObject plexObject, int scrollTo) {
-    preLoadItems();
-    final List<Media> items = plexObject.load(plexClient, mainActivity.server, false);
-    postLoadItems(items, scrollTo);
+  @UiThread
+  void handleLoadItemsResults(PlexObject parent, List<Media> items, int scrollTo) {
+    adapter.setItems(parent, items);
+    swipeRefresh.setRefreshing(false);
+    if (scrollTo > 0) {
+      layoutManager.scrollToPositionWithOffset(scrollTo, 0);
+    } else {
+      recyclerView.scrollToPosition(0);
+    }
   }
 
   int getCurrentPosition() {
     return layoutManager.findFirstCompletelyVisibleItemPosition();
-  }
-
-  @UiThread
-  void preLoadItems() {
-    mainActivity.setTitle(mainActivity.currentPlexObject.getTitle());
-    swipeRefresh.setRefreshing(true);
-  }
-
-  @UiThread
-  void postLoadItems(List<Media> items, int scrollTo) {
-    adapter.setItems(items);
-    swipeRefresh.setRefreshing(false);
-    if (scrollTo > 0) {
-      layoutManager.scrollToPositionWithOffset(mainActivity.currentPosition, 0);
-    } else {
-      recyclerView.scrollToPosition(0);
-    }
   }
 
   @EBean
@@ -164,11 +154,14 @@ public class MainFragment extends Fragment {
       notifyDataSetChanged();
     }
 
-    private void setItems(List<Media> items) {
+    private void setItems(PlexObject parent, List<Media> items) {
+      if (parent instanceof Media) {
+        items.add(0, (Media) parent);
+      }
       this.items = items;
       unwatchedItems.clear();
       for (Media item : items) {
-        if (!item.isWatched()) {
+        if (!item.isWatched() || item == parent) {
           unwatchedItems.add(item);
         }
       }

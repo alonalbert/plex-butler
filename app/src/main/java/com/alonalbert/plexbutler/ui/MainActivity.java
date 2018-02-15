@@ -162,7 +162,25 @@ public class MainActivity extends AppCompatActivity {
 
   @OptionsItem(R.id.menu_refresh)
   protected void refreshItems() {
-    mainFragment.loadItems(currentPlexObject, 0);
+    loadItems(currentPlexObject, 0);
+  }
+
+  @UiThread
+  protected void loadItems(PlexObject plexObject, int scrollTo) {
+    setTitle(plexObject.getTitle());
+    mainFragment.swipeRefresh.setRefreshing(true);
+    doLoadItems(plexObject, scrollTo);
+  }
+
+  @Background
+  protected void doLoadItems(PlexObject plexObject, int scrollTo) {
+    items = plexObject.load(plexClient, server, false);
+    handleLoadItemsResults(plexObject, scrollTo);
+  }
+
+  @UiThread
+  void handleLoadItemsResults(PlexObject parent, int scrollTo) {
+    mainFragment.handleLoadItemsResults(parent, items, scrollTo);
   }
 
   @OptionsItem(R.id.menu_unwatched)
@@ -213,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
   private void loadSection(Section section) {
     currentPlexObject = currentSection = section;
-    mainFragment.loadItems(section, 0);
+    loadItems(section, 0);
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -239,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
         super.onBackPressed();
       } else {
         currentPlexObject = currentSection;
-        mainFragment.loadItems(currentPlexObject, currentPosition);
+        loadItems(currentPlexObject, currentPosition);
       }
     }
   }
@@ -267,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
   public void loadShow(Media show) {
     currentPlexObject = show;
     currentPosition = mainFragment.getCurrentPosition();
-    mainFragment.loadItems(show, 0);
+    loadItems(show, 0);
   }
 
   @EBean
