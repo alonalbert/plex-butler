@@ -259,7 +259,7 @@ public class MainFragment extends Fragment {
             text2.setText(media.getRating());
           }
         } else {
-          text2.setText(String.valueOf(media.getYear()));
+          text2.setText(media.getYear() > 0 ? String.valueOf(media.getYear()) : "");
         }
         text3.setText(TextUtils.join(", ", media.getGenres()));
       }

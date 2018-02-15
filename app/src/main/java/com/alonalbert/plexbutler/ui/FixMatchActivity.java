@@ -22,7 +22,6 @@ import com.alonalbert.plexbutler.plex.model.Match;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.ui.FixMatchActivity_.ItemView_;
 
-import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
@@ -92,21 +91,11 @@ public class FixMatchActivity extends AppCompatActivity {
   @AfterViews
   void afterViews() {
     titleEdit.setText(title);
-    yearEdit.setText(String.valueOf(year));
+    yearEdit.setText(year > 0 ? String.valueOf(year) : "");
     matches.setAdapter(adapter);
 
     titleEdit.setSelection(titleEdit.getText().length());
     yearEdit.setSelection(yearEdit.getText().length());
-  }
-
-  @AfterExtras
-  protected void afterExtras() {
-    if (server == null) {
-      server = new Server("Debug", "ktantanim.com", 27295);
-      key = "7";
-      title = "24: Legacy";
-      year = 2017;
-    }
   }
 
   @Click(R.id.search)
