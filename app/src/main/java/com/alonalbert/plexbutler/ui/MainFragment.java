@@ -2,6 +2,7 @@ package com.alonalbert.plexbutler.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -49,6 +50,12 @@ import java.util.List;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.EPISODE;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.MOVIE;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.SHOW;
+import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_AGENT;
+import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_KEY;
+import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_PLACEHOLDER;
+import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_SERVER;
+import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_TITLE;
+import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_YEAR;
 
 /**
  * Main Fragment
@@ -300,8 +307,22 @@ public class MainFragment extends Fragment {
       }
     }
 
-    @Click(R.id.toggle_watched)
+    @Click(R.id.image)
     protected void onImageClick() {
+      if (media.getType() != EPISODE) {
+        mainActivity.startActivity(new Intent(mainActivity, FixMatchActivity_.class)
+            .putExtra(EXTRA_SERVER, mainActivity.server)
+            .putExtra(EXTRA_KEY, media.getRatingKey())
+            .putExtra(EXTRA_AGENT, mainActivity.currentSection.getAgent())
+            .putExtra(EXTRA_TITLE, media.getTitle())
+            .putExtra(EXTRA_YEAR, media.getYear())
+            .putExtra(EXTRA_PLACEHOLDER, media.getType() == SHOW ? R.drawable.library_type_video : R.drawable.library_type_movie)
+        );
+      }
+    }
+
+    @Click(R.id.toggle_watched)
+    protected void onToggleWatchedClicked() {
       final boolean watched;
       if (media.getType() == SHOW) {
         final int leafCount = media.getLeafCount();

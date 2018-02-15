@@ -2,6 +2,7 @@ package com.alonalbert.plexbutler.plex;
 
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
 import com.alonalbert.plexbutler.plex.model.MediaResponse;
+import com.alonalbert.plexbutler.plex.model.SearchResponse;
 import com.alonalbert.plexbutler.plex.model.SectionsResponse;
 import com.alonalbert.plexbutler.plex.model.Server;
 
@@ -46,4 +47,10 @@ interface PlexClient {
 
   @Get("http://{address}:{port}/library/sections/{key}/refresh")
   void scanLibrary(@Path String address, @Path int port, @Path String key);
+
+  @Get("http://{address}:{port}/library/metadata/{key}/matches?manual=1&title={title}&year={year}&agent={agent}&language=en")
+  SearchResponse getMatches(@Path String address, @Path int port, @Path String key, @Path String agent, @Path String title, @Path String year);
+
+  @Get("http://{address}:{port}/library/metadata/{key}/match?guid={guid}&name={name}")
+  void setMatch(@Path String address, @Path int port, @Path String key, @Path String guid, @Path String name);
 }

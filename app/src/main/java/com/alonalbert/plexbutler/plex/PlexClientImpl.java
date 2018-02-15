@@ -3,18 +3,19 @@ package com.alonalbert.plexbutler.plex;
 import android.annotation.SuppressLint;
 
 import com.alonalbert.plexbutler.plex.model.LoginResponse;
+import com.alonalbert.plexbutler.plex.model.Match;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.Section;
 import com.alonalbert.plexbutler.plex.model.Server;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 import org.androidannotations.rest.spring.annotations.RestService;
 import org.springframework.util.LinkedMultiValueMap;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,8 @@ public class PlexClientImpl {
   private static final String FILTER_ALL = "all";
   private static final String MARK_WATCHED = "scrobble";
   private static final String MARK_UNWATCHED = "unscrobble";
+
+  private static final Escaper ESCAPER = UrlEscapers.urlFormParameterEscaper();
 
   @RestService
   PlexClient plexClient;
@@ -90,13 +93,7 @@ public class PlexClientImpl {
   @SuppressLint("DefaultLocale")
   public String getPhotoUrl(Server server, String photoUri, int width, int height) {
     final String authToken = prefs.plexAuthToken().get();
-    final String uri;
-    try {
-      uri = URLEncoder.encode(photoUri + "?X-Plex-Token=" + authToken, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      // Should not happen
-      throw new RuntimeException(e);
-    }
+    final String uri = ESCAPER.escape(photoUri + "?X-Plex-Token=" + authToken);
 
     return "http://" + server.getAddress() + ":" + server.getPort()
         + "/photo/:/transcode?width=" + width + "&height=" + height + "&minSize=1&url=" + uri
@@ -104,11 +101,29 @@ public class PlexClientImpl {
   }
 
   public void setWatched(Server server, Media media, boolean watched) {
-    plexClient.doAction(server.getAddress(), server.getPort(), watched ? MARK_WATCHED : MARK_UNWATCHED, media.getRatingKey());
+    plexClient.doAction(
+        server.getAddress(),
+        server.getPort(),
+        watched ? MARK_WATCHED : MARK_UNWATCHED,
+        media.getRatingKey());
 
   }
 
   public void scanLibrary(Server server, Section section) {
     plexClient.scanLibrary(server.getAddress(), server.getPort(), section.getKey());
+  }
+
+  public List<Match> getMatches(Server server, String key, String agent, String title, String year) {
+    return plexClient.getMatches(server.getAddress(), server.getPort(), key, agent, title, year)
+        .getItems();
+  }
+
+  public void setMatch(Server server, String key, Match match) {
+    plexClient.setMatch(
+        server.getAddress(),
+        server.getPort(),
+        key,
+        match.getGuid(),
+        match.getName());
   }
 }

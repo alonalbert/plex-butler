@@ -22,10 +22,16 @@ public class Section extends PlexObject {
     @SerializedName("video")
     VIDEO,
   }
+
   private Type type;
+  private String agent;
 
   public Type getType() {
     return type;
+  }
+
+  public String getAgent() {
+    return agent;
   }
 
   @Override

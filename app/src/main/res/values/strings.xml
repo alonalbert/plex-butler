@@ -19,7 +19,7 @@
         completions."
     </string>
     <string name="plex_server">Plex Server</string>
-    <string name="sample_server_name">Name</string>
+    <string name="name">Name</string>
     <string name="sample_section_name">TV Shows</string>
     <string name="header_icon">Header icon</string>
     <string name="title">Title</string>
@@ -37,6 +37,8 @@
     <string name="show_name">Show name</string>
     <string name="pick_server_title">Pick a Server</string>
     <string name="fix_match">Fix Match</string>
-
-
+    <string name="cancel">Cancel</string>
+    <string name="search">Search</string>
+    <string name="year">Year</string>
+    <string name="score">Score: %d</string>
 </resources>

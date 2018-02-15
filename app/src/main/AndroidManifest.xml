@@ -33,7 +33,8 @@
             android:label="@string/pick_server_title"/>
         <activity
             android:name=".ui.FixMatchActivity_"
-            android:label="@string/fix_match"/>
+            android:label="@string/fix_match"
+            android:exported="true"/>
     </application>
 
 </manifest>

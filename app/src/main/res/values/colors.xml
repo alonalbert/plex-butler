@@ -6,4 +6,5 @@
     <color name="watched">#AAAAAA</color>
     <color name="unwatched">#D1801C</color>
     <color name="itemBackground">#CCCCCC</color>
+    <color name="progressBar">#C0C0C0</color>
 </resources>
