@@ -67,7 +67,7 @@
         android:paddingStart="@dimen/toggle_watched_padding"
         android:paddingEnd="@dimen/list_item_padding"
         android:gravity="center_vertical"
-        android:drawableEnd="@drawable/watched_unwatched_24"
+        android:drawableEnd="@drawable/watched_36"
         android:drawablePadding="@dimen/toggle_watched_padding"
         android:textSize="@dimen/list_item_main_text_size"
         android:text="@string/sample_unwatched_count"

@@ -13,10 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -350,7 +347,7 @@ public class MainFragment extends Fragment {
       updatedWatchedToggle();
     }
 
-    @SuppressLint("DefaultLocale")
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     void updatedWatchedToggle() {
       if (media.getType() == SHOW) {
         final int leafCount = media.getLeafCount();
@@ -361,16 +358,11 @@ public class MainFragment extends Fragment {
           toggleWatched.setText(String.valueOf(leafCount));
           toggleWatched.setTextColor(mainActivity.watchedColor);
         } else {
+          toggleWatched.setTextColor(mainActivity.unwatchedColor);
           if (numUnwatched == leafCount) {
             toggleWatched.setText(String.valueOf(leafCount));
-            toggleWatched.setTextColor(mainActivity.unwatchedColor);
           } else {
-            final String source = numUnwatched + "/" + leafCount;
-            Spannable spannable = new SpannableString(source);
-            final int p = source.indexOf('/');
-            spannable.setSpan(new ForegroundColorSpan(mainActivity.unwatchedColor), 0, p, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannable.setSpan(new ForegroundColorSpan(mainActivity.watchedColor), p + 1, source.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            toggleWatched.setText(spannable);
+            toggleWatched.setText(numUnwatched + "/" + leafCount);
           }
         }
       } else {
