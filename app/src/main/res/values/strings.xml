@@ -43,4 +43,5 @@
     <string name="score">Score: %d</string>
     <string name="unmatch">Unmatch</string>
     <string name="unmatched_snack">Unmatched %s</string>
+    <string name="summary_example">Summary</string>
 </resources>

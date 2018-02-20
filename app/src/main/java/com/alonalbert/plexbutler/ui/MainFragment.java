@@ -255,6 +255,8 @@ public class MainFragment extends Fragment {
     @ViewById(R.id.image)
     protected ImageView image;
 
+    @ViewById(R.id.summary)
+    protected TextView summary;
 
     private Media media;
     private final MainActivity mainActivity;
@@ -270,8 +272,9 @@ public class MainFragment extends Fragment {
 
       final int placeholder = media.getType() == MOVIE ? R.drawable.library_type_movie : R.drawable.library_type_show;
 
-      if (media.getArt() != null) {
-        final String photoUrl = mainActivity.getPhotoUrl(media.getArt());
+      final String art = media.getArt();
+      if (art != null) {
+        final String photoUrl = mainActivity.getPhotoUrl(art);
         GlideApp
             .with(getContext())
             .load(photoUrl)
@@ -280,6 +283,10 @@ public class MainFragment extends Fragment {
             .into(image);
       } else {
         image.setImageResource(placeholder);
+      }
+      final String summary = media.getSummary();
+      if (summary != null) {
+        this.summary.setText(summary);
       }
     }
 
