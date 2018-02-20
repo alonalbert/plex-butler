@@ -14,6 +14,7 @@ import java.util.List;
 public abstract class AbstractRecyclerViewAdapter<T, V extends View> extends RecyclerView.Adapter<ViewWrapper<V>> {
 
   protected List<T> items = new ArrayList<>();
+  private ViewGroup parent;
 
   @Override
   public int getItemCount() {
@@ -22,10 +23,13 @@ public abstract class AbstractRecyclerViewAdapter<T, V extends View> extends Rec
 
   @Override
   public final ViewWrapper<V> onCreateViewHolder(ViewGroup parent, int viewType) {
+    this.parent = parent;
     return new ViewWrapper<>(onCreateItemView(parent, viewType));
   }
 
   protected abstract V onCreateItemView(ViewGroup parent, @SuppressWarnings("unused") int viewType);
 
-  // additional methods to manipulate the items
+  public ViewGroup getParent() {
+    return parent;
+  }
 }

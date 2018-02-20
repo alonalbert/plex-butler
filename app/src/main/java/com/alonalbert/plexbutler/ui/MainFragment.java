@@ -15,6 +15,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -60,6 +62,9 @@ import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_YEAR;
  */
 @EFragment(R.layout.main_fragment)
 public class MainFragment extends Fragment {
+  private static final int ITEM_ANIMATION_DURATION = 400;
+  private static final int ITEM_ANIMATION_DELAY = 50;
+
   @Bean
   protected Adapter adapter;
 
@@ -105,10 +110,24 @@ public class MainFragment extends Fragment {
 
     recyclerView.setAdapter(adapter);
     layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+
+    recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+        adapter.animate = false;
+      }
+
+      @Override
+      public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        super.onScrolled(recyclerView, dx, dy);
+      }
+    });
   }
 
   @UiThread
   void handleLoadItemsResults(PlexObject parent, List<Media> items, int scrollTo) {
+    adapter.animate = true;
     adapter.setItems(parent, items);
     swipeRefresh.setRefreshing(false);
     if (scrollTo > 0) {
@@ -116,6 +135,7 @@ public class MainFragment extends Fragment {
     } else {
       recyclerView.scrollToPosition(0);
     }
+
   }
 
   public void setItems(Media parent, List<Media> items) {
@@ -138,6 +158,8 @@ public class MainFragment extends Fragment {
     private boolean unwatchedOnly;
     private boolean hasHeader;
 
+    private boolean animate;
+
     @AfterInject
     void afterInject() {
       unwatchedOnly = prefs.filterUnwatched().get();
@@ -158,6 +180,13 @@ public class MainFragment extends Fragment {
       final Media item = getItem(position);
 
       view.bind(item);
+
+      if (animate) {
+        final TranslateAnimation animation1 = new TranslateAnimation(0, 0, getParent().getHeight(), 0);
+        animation1.setDuration(ITEM_ANIMATION_DURATION);
+        animation1.setStartTime(AnimationUtils.currentAnimationTimeMillis() + position * ITEM_ANIMATION_DELAY);
+        view.setAnimation(animation1);
+      }
     }
 
     void notifyDataSetChanged(boolean unwatchedOnly) {
