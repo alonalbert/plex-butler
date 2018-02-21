@@ -15,6 +15,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
@@ -31,8 +32,11 @@ import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.PlexObject;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
 import com.alonalbert.plexbutler.thetvdb.TheTvDbClientImpl;
-import com.alonalbert.plexbutler.thetvdb.model.GetInfoResponse.SeriesInfo;
-import com.alonalbert.plexbutler.thetvdb.model.SearchResults.SeriesSearchData;
+import com.alonalbert.plexbutler.thetvdb.model.GetInfoResponse;
+import com.alonalbert.plexbutler.thetvdb.model.SearchResults;
+import com.alonalbert.plexbutler.tmdb.TheMovieDbClientImpl;
+import com.alonalbert.plexbutler.tmdb.model.Details;
+import com.alonalbert.plexbutler.tmdb.model.SearchResponse;
 import com.alonalbert.plexbutler.ui.MainFragment_.HeaderItemView_;
 import com.alonalbert.plexbutler.ui.MainFragment_.RowItemView_;
 import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
@@ -49,6 +53,7 @@ import org.androidannotations.annotations.EViewGroup;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.springframework.web.client.RestClientException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +73,8 @@ import static com.alonalbert.plexbutler.ui.FixMatchActivity.EXTRA_YEAR;
  */
 @EFragment(R.layout.main_fragment)
 public class MainFragment extends Fragment {
+  private static final String TAG = "PlexButler";
+
   private static final int ITEM_ANIMATION_DURATION = 400;
   private static final int ITEM_ANIMATION_DELAY = 50;
 
@@ -261,6 +268,9 @@ public class MainFragment extends Fragment {
     @Bean
     protected TheTvDbClientImpl theTvDbClient;
 
+    @Bean
+    protected TheMovieDbClientImpl theMovieDbClient;
+
     @ViewById(R.id.image)
     protected ImageView image;
 
@@ -307,17 +317,36 @@ public class MainFragment extends Fragment {
 
     @Background
     protected void loadImdbId() {
-      final String title = media.getTitle();
-      final List<SeriesSearchData> searchResults = theTvDbClient.search(title);
-      for (SeriesSearchData searchResult : searchResults) {
-        if (title.equals(searchResult.getSeriesName())) {
-          final SeriesInfo seriesInfo = theTvDbClient.getInfo(searchResult.getId());
-          final String imdbId = seriesInfo.getImdbId();
-          if (imdbId != null) {
-            setImdbLink(imdbId);
+      try {
+        final String title = media.getTitle();
+        if (media.getType() == MOVIE) {
+          final List<SearchResponse.SearchResults> searchResults = theMovieDbClient.search(title);
+          for (SearchResponse.SearchResults searchResult : searchResults) {
+            if (title.equals(searchResult.getTitle())) {
+              final Details details = theMovieDbClient.getDetails(searchResult.getId());
+              final String imdbId = details.getImdbId();
+              if (!TextUtils.isEmpty(imdbId)) {
+                setImdbLink(imdbId);
+              }
+              break;
+            }
           }
-          break;
         }
+        else {
+          final List<SearchResults.SeriesSearchData> searchResults = theTvDbClient.search(title);
+          for (SearchResults.SeriesSearchData searchResult : searchResults) {
+            if (title.equals(searchResult.getSeriesName())) {
+              final GetInfoResponse.SeriesInfo seriesInfo = theTvDbClient.getInfo(searchResult.getId());
+              final String imdbId = seriesInfo.getImdbId();
+              if (!TextUtils.isEmpty(imdbId)) {
+                setImdbLink(imdbId);
+              }
+              break;
+            }
+          }
+        }
+      } catch (RestClientException e) {
+        Log.e(TAG, "Error reading from The Movie DB", e);
       }
     }
 
