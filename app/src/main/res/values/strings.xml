@@ -44,4 +44,5 @@
     <string name="unmatch">Unmatch</string>
     <string name="unmatched_snack">Unmatched %s</string>
     <string name="summary_example">Summary</string>
+    <string name="imdb">IMDB</string>
 </resources>

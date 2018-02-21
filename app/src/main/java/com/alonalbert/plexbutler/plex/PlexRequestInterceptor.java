@@ -21,9 +21,9 @@ import org.springframework.http.client.ClientHttpResponse;
 import java.io.IOException;
 
 /**
- * Request Interceptor
+ * Plex Request Interceptor
  */
-@EBean
+@EBean(scope = EBean.Scope.Singleton)
 public class PlexRequestInterceptor implements ClientHttpRequestInterceptor {
 
   @Pref

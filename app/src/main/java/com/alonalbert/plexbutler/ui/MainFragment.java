@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -17,6 +18,7 @@ import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -28,6 +30,9 @@ import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.PlexObject;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
+import com.alonalbert.plexbutler.thetvdb.TheTvDbClientImpl;
+import com.alonalbert.plexbutler.thetvdb.model.GetInfoResponse.SeriesInfo;
+import com.alonalbert.plexbutler.thetvdb.model.SearchResults.SeriesSearchData;
 import com.alonalbert.plexbutler.ui.MainFragment_.HeaderItemView_;
 import com.alonalbert.plexbutler.ui.MainFragment_.RowItemView_;
 import com.alonalbert.plexbutler.ui.recyclerview.AbstractRecyclerViewAdapter;
@@ -35,6 +40,7 @@ import com.alonalbert.plexbutler.ui.recyclerview.ViewWrapper;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EBean;
@@ -252,14 +258,21 @@ public class MainFragment extends Fragment {
   @EViewGroup(R.layout.header_item)
   public static class HeaderItemView extends ItemView {
 
+    @Bean
+    protected TheTvDbClientImpl theTvDbClient;
+
     @ViewById(R.id.image)
     protected ImageView image;
 
     @ViewById(R.id.summary)
     protected TextView summary;
 
+    @ViewById(R.id.imdb)
+    protected Button imdb;
+
     private Media media;
     private final MainActivity mainActivity;
+    private String imdbId;
 
     public HeaderItemView(Context context) {
       super(context);
@@ -288,6 +301,35 @@ public class MainFragment extends Fragment {
       if (summary != null) {
         this.summary.setText(summary);
       }
+      imdb.setVisibility(GONE);
+      loadImdbId();
+    }
+
+    @Background
+    protected void loadImdbId() {
+      final String title = media.getTitle();
+      final List<SeriesSearchData> searchResults = theTvDbClient.search(title);
+      for (SeriesSearchData searchResult : searchResults) {
+        if (title.equals(searchResult.getSeriesName())) {
+          final SeriesInfo seriesInfo = theTvDbClient.getInfo(searchResult.getId());
+          final String imdbId = seriesInfo.getImdbId();
+          if (imdbId != null) {
+            setImdbLink(imdbId);
+          }
+          break;
+        }
+      }
+    }
+
+    @UiThread
+    protected void setImdbLink(String imdbId) {
+      this.imdbId = imdbId;
+      imdb.setVisibility(VISIBLE);
+    }
+
+    @Click(R.id.imdb)
+    protected void openImdb() {
+      mainActivity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.imdb.com/title/" + imdbId)));
     }
 
     @Click(R.id.unmatch)
