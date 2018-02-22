@@ -140,13 +140,14 @@ public class MainFragment extends Fragment {
 
   @UiThread
   void handleLoadItemsResults(PlexObject parent, List<Media> items, int scrollTo) {
-    adapter.animate = true;
     adapter.setItems(parent, items);
     swipeRefresh.setRefreshing(false);
-    if (scrollTo > 0) {
+    if (scrollTo >= 0) {
       layoutManager.scrollToPositionWithOffset(scrollTo, 0);
+      adapter.animate = false;
     } else {
       recyclerView.scrollToPosition(0);
+      adapter.animate = true;
     }
 
   }

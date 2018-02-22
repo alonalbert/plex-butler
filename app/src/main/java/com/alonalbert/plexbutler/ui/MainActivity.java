@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
   @OptionsItem(R.id.menu_refresh)
   protected void refreshItems() {
-    loadItems(currentPlexObject, 0);
+    loadItems(currentPlexObject, -1);
   }
 
   @UiThread
@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
 
   private void loadSection(Section section) {
     currentPlexObject = currentSection = section;
-    loadItems(section, 0);
+    loadItems(section, -1);
   }
 
   @OnActivityResult(LOGIN_REQUEST_CODE)
@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
   public void loadShow(Media show) {
     currentPlexObject = show;
     currentPosition = mainFragment.getCurrentPosition();
-    loadItems(show, 0);
+    loadItems(show, -1);
   }
 
   public void loadMovie(Media media) {
