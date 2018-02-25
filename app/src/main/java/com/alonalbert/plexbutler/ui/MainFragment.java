@@ -31,6 +31,8 @@ import com.alonalbert.plexbutler.plex.PlexClientImpl;
 import com.alonalbert.plexbutler.plex.model.Media;
 import com.alonalbert.plexbutler.plex.model.PlexObject;
 import com.alonalbert.plexbutler.settings.PlexButlerPreferences_;
+import com.alonalbert.plexbutler.sickrage.model.AddShowResponse;
+import com.alonalbert.plexbutler.sickrage.model.SickrageClientImpl;
 import com.alonalbert.plexbutler.thetvdb.TheTvDbClientImpl;
 import com.alonalbert.plexbutler.thetvdb.model.GetInfoResponse;
 import com.alonalbert.plexbutler.thetvdb.model.SearchResults;
@@ -270,6 +272,9 @@ public class MainFragment extends Fragment {
     protected TheTvDbClientImpl theTvDbClient;
 
     @Bean
+    protected SickrageClientImpl sickrageClient;
+
+    @Bean
     protected TheMovieDbClientImpl theMovieDbClient;
 
     @ViewById(R.id.image)
@@ -281,8 +286,12 @@ public class MainFragment extends Fragment {
     @ViewById(R.id.imdb)
     protected Button imdb;
 
+    @ViewById(R.id.sickrage)
+    protected Button sickrage;
+
     private Media media;
     private final MainActivity mainActivity;
+    private int theTvDbId;
     private String imdbId;
 
     public HeaderItemView(Context context) {
@@ -313,6 +322,7 @@ public class MainFragment extends Fragment {
         this.summary.setText(summary);
       }
       imdb.setVisibility(GONE);
+      sickrage.setVisibility(GONE);
       loadImdbId();
     }
 
@@ -327,7 +337,8 @@ public class MainFragment extends Fragment {
               final Details details = theMovieDbClient.getDetails(searchResult.getId());
               final String imdbId = details.getImdbId();
               if (!TextUtils.isEmpty(imdbId)) {
-                setImdbLink(imdbId);
+                this.imdbId = imdbId;
+                enableImdb();
               }
               break;
             }
@@ -338,9 +349,12 @@ public class MainFragment extends Fragment {
           for (SearchResults.SeriesSearchData searchResult : searchResults) {
             if (title.equals(searchResult.getSeriesName())) {
               final GetInfoResponse.SeriesInfo seriesInfo = theTvDbClient.getInfo(searchResult.getId());
+              theTvDbId = searchResult.getId();
               final String imdbId = seriesInfo.getImdbId();
+              enableSickrage();
               if (!TextUtils.isEmpty(imdbId)) {
-                setImdbLink(imdbId);
+                this.imdbId = imdbId;
+                enableImdb();
               }
               break;
             }
@@ -348,18 +362,56 @@ public class MainFragment extends Fragment {
         }
       } catch (RestClientException e) {
         Log.e(TAG, "Error reading from The Movie DB", e);
+        showErrorSnack("Error reading from The Movie DB: " + e.getMessage());
       }
     }
 
     @UiThread
-    protected void setImdbLink(String imdbId) {
-      this.imdbId = imdbId;
+    void showErrorSnack(String text) {
+      final Snackbar snackbar = Snackbar.make(this, text, Snackbar.LENGTH_SHORT);
+      snackbar.getView().setBackgroundColor(mainActivity.getResources().getColor(android.R.color.holo_red_light));
+      snackbar.show();
+
+    }
+
+    @UiThread
+    protected void enableSickrage() {
+      sickrage.setVisibility(VISIBLE);
+    }
+
+    @UiThread
+    protected void enableImdb() {
       imdb.setVisibility(VISIBLE);
     }
 
     @Click(R.id.imdb)
     protected void openImdb() {
       mainActivity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.imdb.com/title/" + imdbId)));
+    }
+
+    @Click(R.id.sickrage)
+    @Background
+    protected void addToSickrage() {
+      final PlexButlerPreferences_ prefs = mainActivity.prefs;
+      if (TextUtils.isEmpty(prefs.sickrageServer().get()) || TextUtils.isEmpty(prefs.sickrageApiKey().get())) {
+        mainActivity.startActivity(new Intent(mainActivity, SettingsActivity_.class));
+      } else {
+        try {
+          final AddShowResponse response = sickrageClient.addShow(theTvDbId);
+          onAddShowResponse(response);
+        } catch (RestClientException e) {
+          showErrorSnack("Error adding show to Sickrage: " + e.getMessage());
+        }
+      }
+    }
+
+    @UiThread
+    void onAddShowResponse(AddShowResponse response) {
+      final Snackbar snackbar = Snackbar.make(this, response.getMessage(), Snackbar.LENGTH_SHORT);
+      if (!"success".equals(response.getResult())) {
+        snackbar.getView().setBackgroundColor(mainActivity.getResources().getColor(android.R.color.holo_red_light));
+      }
+      snackbar.show();
     }
 
     @Click(R.id.unmatch)

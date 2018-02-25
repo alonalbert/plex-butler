@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:dialogTitle="@string/sickrage_server_dialog_title"
+        android:key="sickrageServer"
+        android:summary="@string/sickrage_server_summary"
+        android:title="@string/sickrage_server_title"
+        />
+
+    <EditTextPreference
+        android:dialogTitle="@string/sickrage_port_dialog_title"
+        android:key="sickragePort"
+        android:inputType="number"
+        android:defaultValue="8081"
+        android:title="@string/sickrage_port_title"
+        />
+
+    <CheckBoxPreference
+        android:key="sickrageHttps"
+        android:summary="@string/sickrage_https_summary"
+        android:title="@string/sickrage_https_title"
+        />
+
+    <EditTextPreference
+        android:dialogTitle="@string/sickrage_api_key_dialog_title"
+        android:key="sickrageApiKey"
+        android:summary="@string/sickrage_api_key_summary"
+        android:title="@string/sickrage_api_key_title"
+        />
+
+</PreferenceScreen>

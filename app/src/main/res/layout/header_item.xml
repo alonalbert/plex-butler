@@ -25,6 +25,17 @@
         android:layout_margin="16dp"
         />
 
+    <Button
+        android:id="@+id/sickrage"
+        android:textSize="12sp"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        android:text="@string/sickrage"
+        android:layout_alignTop="@id/image"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        />
 
     <Button
         android:id="@+id/unmatch"

@@ -166,6 +166,20 @@ public class MainActivity extends AppCompatActivity {
     loadItems(currentPlexObject, -1);
   }
 
+  @OptionsItem(R.id.menu_unwatched)
+  protected void menuToggleWatched() {
+    final boolean newState = !menuUnwatched.isChecked();
+    menuUnwatched.setChecked(newState);
+    prefs.edit().filterUnwatched().put(newState).apply();
+    mainFragment.adapter.notifyDataSetChanged(newState);
+    menuUnwatched.setIcon(newState ? iconUnwatched : iconWatched);
+  }
+
+  @OptionsItem(R.id.menu_settings)
+  protected void menuSettings() {
+    startActivity(new Intent(this, SettingsActivity_.class));
+  }
+
   @UiThread
   protected void loadItems(PlexObject plexObject, int scrollTo) {
     setTitle(plexObject.getTitle());
@@ -183,16 +197,6 @@ public class MainActivity extends AppCompatActivity {
   void handleLoadItemsResults(PlexObject parent, int scrollTo) {
     mainFragment.handleLoadItemsResults(parent, items, scrollTo);
   }
-
-  @OptionsItem(R.id.menu_unwatched)
-  protected void menuToggleWatched() {
-    final boolean newState = !menuUnwatched.isChecked();
-    menuUnwatched.setChecked(newState);
-    prefs.edit().filterUnwatched().put(newState).apply();
-    mainFragment.adapter.notifyDataSetChanged(newState);
-    menuUnwatched.setIcon(newState ? iconUnwatched : iconWatched);
-  }
-
 
   @Background
   protected void selectServer() {

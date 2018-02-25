@@ -45,4 +45,20 @@
     <string name="unmatched_snack">Unmatched %s</string>
     <string name="summary_example">Summary</string>
     <string name="imdb">IMDB</string>
+    <string name="sickrage_api_key_title">Sickrage API Key</string>
+    <string name="sickrage_api_key_dialog_title">Sickrage API Key</string>
+    <string name="sickrage_api_key_summary">Please enter an API key</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="sickrage">Sickrage</string>
+    <string name="sickrage_server">sickrageServer</string>
+    <string name="sickrage_port">sickragePort</string>
+    <string name="sickrage_api_key">sickrageApiKey</string>
+    <string name="sickrage_https_title">Sickrage HTTPS</string>
+    <string name="sickrage_https_summary">Check if server is HTTPS</string>
+    <string name="sickrage_port_summary">Please enter Sickrage port number</string>
+    <string name="sickrage_port_title">Sickrage Port</string>
+    <string name="sickrage_port_dialog_title">Enter Port Number</string>
+    <string name="sickrage_server_title">Sickrage Server</string>
+    <string name="sickrage_server_dialog_title">Enter Server Address</string>
+    <string name="sickrage_server_summary">Please enter server address</string>
 </resources>
