@@ -12,6 +12,6 @@ import org.springframework.http.converter.json.GsonHttpMessageConverter;
  */
 @Rest(converters = GsonHttpMessageConverter.class)
 public interface SickrageClient {
-  @Get("{schema}://{server}:{port}api/{apikey}/?cmd=show.addnew&tvdbid={id}")
+  @Get("{schema}://{server}:{port}api/{apikey}/?cmd=show.addnew&tvdbid={id}&status=wanted")
   AddShowResponse addShow(@Path String schema, @Path String server, @Path int port, @Path String apikey, @Path int id);
 }
