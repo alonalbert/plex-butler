@@ -414,15 +414,10 @@ public class MainFragment extends Fragment {
 
     @Background void doAddShow() {
       try {
-        Thread.sleep(3000);
-//        final AddShowResponse response = sickrageClient.addShow(theTvDbId);
-
-        AddShowResponse response = new AddShowResponse();
+        final AddShowResponse response = sickrageClient.addShow(theTvDbId);
         onAddShowResponse(response);
       } catch (RestClientException e) {
         showErrorSnack("Error adding show to Sickrage: " + e.getMessage());
-      } catch (InterruptedException e) {
-        e.printStackTrace();
       }
     }
 
