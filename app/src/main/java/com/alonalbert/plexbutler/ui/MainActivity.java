@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    mainFragment.onBackPressed();
     if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
       drawerLayout.closeDrawer(GravityCompat.START);
     } else {

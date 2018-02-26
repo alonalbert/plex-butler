@@ -1,4 +1,6 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/list_item_height"
@@ -29,7 +31,7 @@
         android:layout_alignParentEnd="true"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="@string/name"
+        tools:text="The X-Files"
         android:textSize="@dimen/list_item_main_text_size"
         />
 
@@ -44,7 +46,7 @@
         android:layout_alignParentEnd="true"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="@string/year_example"
+        tools:text="2018"
         />
 
     <TextView
@@ -59,7 +61,7 @@
         android:layout_alignParentEnd="true"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="@string/score"
+        tools:text="98"
         />
 
 </RelativeLayout>

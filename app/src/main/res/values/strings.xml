@@ -20,14 +20,10 @@
     </string>
     <string name="plex_server">Plex Server</string>
     <string name="name">Name</string>
-    <string name="sample_section_name">TV Shows</string>
     <string name="header_icon">Header icon</string>
     <string name="title">Title</string>
     <string name="tv_show">TV Show</string>
-    <string name="genre_example">Drama, Crime</string>
-    <string name="year_example">2018</string>
     <string name="toggle_watched_state">Toggle watched state</string>
-    <string name="sample_unwatched_count">3</string>
     <string name="episode_title" tools:ignore="PluralsCandidate">Season %1$d Episode %2$02d</string>
     <string name="year_and_rating" tools:ignore="PluralsCandidate">%1$d Rating: %2$s</string>
     <string name="aired_on">Aired on %1$s</string>
@@ -43,7 +39,6 @@
     <string name="score">Score: %d</string>
     <string name="unmatch">Unmatch</string>
     <string name="unmatched_snack">Unmatched %s</string>
-    <string name="summary_example">Summary</string>
     <string name="imdb">IMDB</string>
     <string name="sickrage_api_key_title">Sickrage API Key</string>
     <string name="sickrage_api_key_dialog_title">Sickrage API Key</string>

@@ -16,11 +16,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -60,6 +62,7 @@ import org.springframework.web.client.RestClientException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.EPISODE;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.MOVIE;
 import static com.alonalbert.plexbutler.plex.model.Media.Type.SHOW;
@@ -91,6 +94,9 @@ public class MainFragment extends Fragment {
 
   @ViewById(R.id.recycler_view)
   protected RecyclerView recyclerView;
+
+  @ViewById(R.id.progress_bar)
+  protected ProgressBar progressBar;
 
   private MainActivity mainActivity;
   private LinearLayoutManager layoutManager;
@@ -140,6 +146,7 @@ public class MainFragment extends Fragment {
     });
   }
 
+
   @UiThread
   void handleLoadItemsResults(PlexObject parent, List<Media> items, int scrollTo) {
     adapter.setItems(parent, items);
@@ -160,6 +167,10 @@ public class MainFragment extends Fragment {
 
   int getCurrentPosition() {
     return layoutManager.findFirstCompletelyVisibleItemPosition();
+  }
+
+  public void onBackPressed() {
+    progressBar.setVisibility(View.GONE);
   }
 
   @EBean
@@ -390,24 +401,37 @@ public class MainFragment extends Fragment {
     }
 
     @Click(R.id.sickrage)
-    @Background
     protected void addToSickrage() {
       final PlexButlerPreferences_ prefs = mainActivity.prefs;
       if (TextUtils.isEmpty(prefs.sickrageServer().get()) || TextUtils.isEmpty(prefs.sickrageApiKey().get())) {
         mainActivity.startActivity(new Intent(mainActivity, SettingsActivity_.class));
       } else {
-        try {
-          final AddShowResponse response = sickrageClient.addShow(theTvDbId);
-          onAddShowResponse(response);
-        } catch (RestClientException e) {
-          showErrorSnack("Error adding show to Sickrage: " + e.getMessage());
-        }
+        mainActivity.getWindow().setFlags(FLAG_NOT_TOUCHABLE, FLAG_NOT_TOUCHABLE);
+        mainActivity.mainFragment.progressBar.setVisibility(VISIBLE);
+        doAddShow();
+      }
+    }
+
+    @Background void doAddShow() {
+      try {
+        Thread.sleep(3000);
+//        final AddShowResponse response = sickrageClient.addShow(theTvDbId);
+
+        AddShowResponse response = new AddShowResponse();
+        onAddShowResponse(response);
+      } catch (RestClientException e) {
+        showErrorSnack("Error adding show to Sickrage: " + e.getMessage());
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
 
     @UiThread
     void onAddShowResponse(AddShowResponse response) {
-      final Snackbar snackbar = Snackbar.make(this, response.getMessage(), Snackbar.LENGTH_SHORT);
+      mainActivity.getWindow().clearFlags(FLAG_NOT_TOUCHABLE);
+      mainActivity.mainFragment.progressBar.setVisibility(GONE);
+
+      final Snackbar snackbar = Snackbar.make(mainActivity.findViewById(android.R.id.content), response.getMessage(), Snackbar.LENGTH_SHORT);
       if (!"success".equals(response.getResult())) {
         snackbar.getView().setBackgroundColor(mainActivity.getResources().getColor(android.R.color.holo_red_light));
       }

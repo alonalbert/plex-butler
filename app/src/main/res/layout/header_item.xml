@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     >
@@ -67,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/image"
         android:layout_margin="16dp"
-        android:text="@string/summary_example"
+        tools:text="This area will display a short summary of the movie/show. It should allow for long text."
         />
 
 </RelativeLayout>
