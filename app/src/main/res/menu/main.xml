@@ -5,6 +5,7 @@
         android:id="@+id/menu_unwatched"
         android:title="@string/menu_toggle_watched"
         android:checkable="true"
+        android:icon="@drawable/watched_24"
         app:showAsAction="ifRoom"
         />
     <item
