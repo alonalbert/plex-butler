@@ -8,4 +8,5 @@ The features it adds include:
 * Fix Match & Unmatch  a Show/Movie.
 * Initiate a server library rescan.
 * Show IMDB Link if found.
+* Add a show to a SickRage server.
 
